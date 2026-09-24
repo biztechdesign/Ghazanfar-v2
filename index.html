@@ -3,39 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>Ghazanfar Bank — Shariah-Compliant Digital Banking</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/card-front-black.webp" type="image/webp">
 <script src="https://cdn.jsdelivr.net/npm/lucide@1.47.0/dist/umd/lucide.min.js" defer></script>
 <style>
   :root{
-    --navy:#014493;
-    --navy-dark:#003e84;
+    /* brand + extended palette */
+    --brand-blue:#003E84;
+    --brand-green:#009136;
+    --brand-gold:#C88F27;
+    --forest:#073B32;
+    --forest-deep:#052A25;
+    --sage:#DCE9D8;
+    --mist:#F1F6F1;
+    --paper:#F2F2E8;
+    --text-secondary:#667085;
+    --border-soft:#DDE5E1;
+    /* shape, space, elevation */
+    --radius-card:20px;
+    --radius-btn:10px;
+    --section-y:88px;
+    --shadow-card:0 1px 2px rgba(16,24,40,.04);
+    --shadow-lift:0 12px 28px -16px rgba(5,42,37,.22);
+    --navy:#003E84;
+    --navy-dark:#002f66;
     --navy-deep:#11529a;
     --green:#009136;
     --ink:#101828;
     --body-text:#4a5565;
-    --muted:#6b7280;
-    --line:#e5e7eb;
-    --tab-inactive:#364153;
-    --bg:#ffffff;
+    --muted:#667085;
+    --line:#DDE5E1;
+    --bg:#F2F2E8;
     --card-bg:#ffffff;
-    --page-bg:#ffffff;
-    --nav-glass-bg:rgba(255,255,255,.62);
-    --footer-bg:#003e84;
-    --footer-link:#d1d5dc;
+    --page-bg:#F2F2E8;
+    --nav-glass-bg:rgba(242,242,232,.78);
+    --footer-bg:#052A25;
+    --footer-link:#DCE9D8;
     --motif-tint:#eef3fa;
     --motif-line-star:rgba(1,68,147,.16);
     --motif-line-cross:rgba(1,68,147,.11);
     --motif-node:rgba(243,183,26,.06);
     --scrim-rgb:255,255,255;
-    --ease:cubic-bezier(.16,.8,.24,1);
+    --ease:cubic-bezier(.22,1,.36,1);
     --ease-in:cubic-bezier(.4,0,1,1);
-    --dur-xs:.18s;
-    --dur-s:.35s;
-    --dur-m:.6s;
-    --dur-l:.7s;
+    --dur-xs:.25s;
+    --dur-s:.5s;
+    --dur-m:.85s;
+    --dur-l:1s;
     --nav-h:132px;
   }
   @media (prefers-color-scheme: dark){
@@ -71,6 +89,13 @@
   }
 
   *{box-sizing:border-box;}
+  /* baseline: anything interactive that has no transition of its own still eases */
+  :where(a, button, input, textarea, select, summary){
+    transition-property:color, background-color, border-color, box-shadow, opacity, transform, filter, stroke;
+    transition-duration:var(--dur-s);transition-timing-function:var(--ease);}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} :where(a,button,input,textarea,select,summary){transition:none;} }
+
   html,body{margin:0;padding:0;overflow-x:hidden;}
   body{
     font-family:'Onest',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
@@ -105,12 +130,15 @@
      asked for reduced motion — without JS/with reduced motion everything is
      simply visible, no hidden-content trap. */
   .has-js [data-reveal]{
-    opacity:0;transform:translateY(28px);
+    opacity:0;transform:translateY(22px);
     transition:opacity var(--dur-m) var(--ease), transform var(--dur-m) var(--ease);
     transition-delay:var(--reveal-delay,0ms);
     will-change:opacity,transform;
   }
   .has-js [data-reveal="fade"]{transform:none;}
+  .has-js [data-reveal="left"]{transform:translateX(-40px);}
+  .has-js [data-reveal="right"]{transform:translateX(40px);}
+  .has-js [data-reveal="zoom"]{transform:scale(.95);}
   .has-js [data-reveal].in-view{opacity:1;transform:none;}
 
   /* image/hover zoom: any media wrapped in .zoom-frame scales its child on hover/focus */
@@ -124,26 +152,11 @@
     transform:scale(1.06);
   }
 
-  /* smooth crossfade when a tab panel swaps in — the outgoing panel exits
-     quickly (ease-in, upward) before the incoming one enters (ease-out,
-     from below), so the swap reads as one continuous motion rather than a
-     snap-cut. */
-  .tab-body{
-    transition:opacity var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);
-    opacity:0;transform:translateY(10px);
-  }
-  .tab-body.panel-in{opacity:1;transform:none;}
-  .tab-body.panel-out{
-    transition:opacity var(--dur-xs) var(--ease-in), transform var(--dur-xs) var(--ease-in);
-    opacity:0;transform:translateY(-6px);
-  }
-
   @media (prefers-reduced-motion: reduce){
     [data-reveal]{opacity:1!important;transform:none!important;transition:none!important;}
     .zoom-frame img, .zoom-frame .zoom-target{transition:none!important;}
     .zoom-frame:hover img, .zoom-frame:hover .zoom-target,
     .zoom-frame:focus-within img, .zoom-frame:focus-within .zoom-target{transform:none!important;}
-    .tab-body{transition:none!important;opacity:1!important;transform:none!important;}
   }
 
   /* ---------- NAV ---------- */
@@ -155,8 +168,8 @@
   }
   .nav::before{
     content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
-    background:linear-gradient(to bottom, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 100%);
-    opacity:1;transition:opacity var(--dur-m) var(--ease);
+    background:none;
+    opacity:0;transition:opacity var(--dur-m) var(--ease);
   }
   .nav.scrolled{
     background:var(--nav-glass-bg);
@@ -168,12 +181,17 @@
   .nav.scrolled::before{ opacity:0; }
   @media (prefers-reduced-motion: reduce){ .nav{transition:none;} .nav::before{transition:none;} }
   .nav-inner{
-    display:flex;align-items:center;justify-content:space-between;
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
     max-width:1280px;margin:0 auto;padding:16px 32px;
-    gap:24px; flex-wrap:wrap;
+    gap:24px;
   }
   @media (max-width:640px){ .nav-inner{padding:16px 18px;} }
-  .brand{display:flex;align-items:center;gap:10px;}
+  /* explicit column assignment so nav-right stays pinned to the right edge
+     even when .primary-nav is display:none (mobile), instead of relying on
+     grid auto-placement order which would otherwise shift it inward */
+  .brand{grid-column:1;display:flex;align-items:center;gap:10px;}
+  .primary-nav{grid-column:2;justify-self:center;}
+  .nav-right{grid-column:3;}
   .brand img{height:100px;width:auto;flex-shrink:0;transition:height var(--dur-m) var(--ease);}
   .nav.scrolled .brand img{height:44px;}
   @media (prefers-reduced-motion: reduce){ .brand img{transition:none;} }
@@ -184,8 +202,8 @@
     font-size:15px;font-weight:500;color:var(--body-text);white-space:nowrap;
     transition:color var(--dur-s) var(--ease), background-color var(--dur-s) var(--ease);
   }
-  .primary-nav .menu:hover, .primary-nav a:hover{color:var(--navy);}
-  .primary-nav .menu[aria-expanded="true"]{color:var(--navy);background:rgba(1,68,147,.06);}
+  .primary-nav .menu:hover, .primary-nav a:hover{color:var(--forest);}
+  .primary-nav .menu[aria-expanded="true"]{color:var(--forest);background:rgba(7,59,50,.06);}
   .chev{width:10px;height:10px;opacity:.6;flex-shrink:0;}
   .dropdown{position:absolute;top:calc(100% + 6px);left:0;min-width:220px;background:var(--card-bg);
     border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 32px -8px rgba(0,0,0,.18);
@@ -194,7 +212,7 @@
   .dropdown a{display:block;padding:10px 12px;min-height:44px;display:flex;align-items:center;
     border-radius:8px;font-size:14.5px;color:var(--body-text);
     transition:background-color var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease);}
-  .dropdown a:hover{background:rgba(1,68,147,.06);color:var(--navy);}
+  .dropdown a:hover{background:rgba(7,59,50,.06);color:var(--forest);}
   .megamenu{position:fixed;top:var(--nav-h,132px);left:0;right:0;width:100%;min-width:0;
     background:var(--card-bg);border:none;border-top:1px solid var(--line);
     border-radius:0 0 20px 20px;box-shadow:0 24px 48px -16px rgba(16,24,40,.18);
@@ -203,21 +221,21 @@
   .megamenu-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
   .megamenu-col-head{display:flex;align-items:center;gap:10px;padding-bottom:10px;
     margin-bottom:10px;border-bottom:1px solid var(--line);}
-  .megamenu-col-head svg{width:20px;height:20px;color:var(--navy);flex-shrink:0;}
-  .megamenu-col-head h4{margin:0;font-size:16px;font-weight:700;color:var(--navy);}
+  .megamenu-col-head svg{width:20px;height:20px;color:var(--forest);flex-shrink:0;}
+  .megamenu-col-head h4{margin:0;font-size:16px;font-weight:700;color:var(--ink);}
   .megamenu-col-list{display:flex;flex-direction:column;gap:0;}
   .megamenu-col-list a{display:block;padding:6px 4px;border-radius:8px;font-size:14.5px;
     color:var(--body-text);transition:color var(--dur-xs) var(--ease), background-color var(--dur-xs) var(--ease);}
-  .megamenu-col-list a:hover{color:var(--navy);background:rgba(1,68,147,.05);}
+  .megamenu-col-list a:hover{color:var(--forest);background:rgba(7,59,50,.06);}
   .megamenu-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 40px;}
   .megamenu-card{display:flex;align-items:center;gap:14px;padding:4px;border-radius:12px;
     transition:background-color var(--dur-xs) var(--ease);}
-  .megamenu-card:hover{background:rgba(1,68,147,.05);}
-  .megamenu-card-icon{width:48px;height:48px;border-radius:12px;background:rgba(1,68,147,.08);
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--navy);
+  .megamenu-card:hover{background:rgba(7,59,50,.06);}
+  .megamenu-card-icon{width:48px;height:48px;border-radius:50%;background:var(--forest);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;
     font-size:17px;font-weight:700;}
   .megamenu-card-icon svg{width:22px;height:22px;}
-  .megamenu-card-text strong{display:block;font-size:16px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+  .megamenu-card-text strong{display:block;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:2px;}
   .megamenu-card-text small{display:block;font-size:13px;font-weight:400;color:var(--body-text);}
   .nav-right{display:flex;align-items:center;gap:14px;}
   .lang{display:flex;align-items:center;gap:4px;font-size:14px;color:var(--body-text);padding:6px 10px;
@@ -245,39 +263,50 @@
   .mobile-nav .m-menu-btn[aria-expanded="true"] .chev{transform:rotate(180deg);}
   .mobile-nav .m-lang-login{display:flex;gap:10px;margin-top:12px;}
   .mobile-nav .m-lang-login .acct{flex:1;justify-content:center;}
+  .mobile-nav a.btn{justify-content:center;padding:10px 20px;font-size:15px;font-weight:700;border:1.5px solid transparent;}
+  .mobile-nav a.btn--forest{color:#fff;}
+  .mobile-nav a.btn--gold{color:var(--ink);}
   @media (max-width:900px){
     .primary-nav{display:none;}
     .nav-toggle{display:flex;}
+    .nav-open-acct{display:none;}
     .mobile-nav.open{display:flex;}
   }
 
   /* ---------- FOREIGN EXCHANGE ---------- */
-  /* container-width card, pulled up on a negative margin so it overlaps the
-     hero banner above it instead of sitting in its own full-bleed strip. */
-  .fx-section{position:relative;z-index:2;padding:0;margin-top:-40px;}
-  .fx-card{background:var(--navy);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px 26px;}
-  .fx-head{margin-bottom:18px;}
-  .fx-eyebrow{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#fff;}
-  .fx-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-  .fx-item{border:1px solid rgba(255,255,255,.16);border-radius:9px;padding:12px 16px;background:rgba(255,255,255,.04);
-    display:flex;align-items:center;justify-content:space-between;gap:14px;
-    transition:background-color var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);}
-  .fx-item:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3);transform:translateY(-2px);}
+  /* Sits in normal flow below the hero (no overlap). Eyebrow + heading with
+     an "Updated" pill on the right, then three light cards: currency
+     header, a tinted buy/sell panel split by a divider, and a footer with
+     the quote basis and spread. */
+  .fx-section{position:relative;padding-bottom:0;}
+  .fx-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px;}
+  .fx-eyebrow{display:block;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+    color:var(--navy);margin-bottom:8px;}
+  .fx-head h2{font-size:34px;font-weight:800;color:var(--ink);margin:0;line-height:1.25;letter-spacing:-.3px;}
+  .fx-updated{display:inline-flex;align-items:center;gap:8px;background:#e5f4eb;color:var(--ink);
+    font-size:12px;font-weight:700;padding:8px 14px;border-radius:999px;}
+  .fx-updated::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .fx-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .fx-item{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--card-bg);
+    border:1px solid var(--line);border-radius:var(--radius-card);padding:16px 20px;
+    transition:transform var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease);}
+  .fx-item:hover{transform:translateY(-3px);border-color:var(--forest);}
   @media (prefers-reduced-motion: reduce){ .fx-item{transition:none;} .fx-item:hover{transform:none;} }
-  .fx-cur{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-  .fx-icon{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;}
-  .fx-name{display:flex;flex-direction:column;line-height:1.2;}
-  .fx-name b{font-size:12.5px;color:#fff;font-weight:800;}
-  .fx-name small{font-size:10px;color:rgba(255,255,255,.6);font-weight:500;}
-  .fx-rates{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:40px;padding-left:14px;border-left:1px solid rgba(255,255,255,.15);}
-  .fx-label{display:block;font-size:10px;color:rgba(255,255,255,.6);margin-bottom:1px;}
-  .fx-value{display:block;font-size:15px;font-weight:800;color:#fff;letter-spacing:-.2px;}
-  @media (max-width:900px){
-    .fx-section{margin-top:-24px;}
-    .fx-card{padding:18px 16px;}
-    .fx-row{grid-template-columns:1fr;}
-  }
+  .fx-item__top{display:flex;align-items:center;gap:12px;margin:0;min-width:0;}
+  .fx-item__icon{width:46px;height:46px;border-radius:50%;background:var(--forest);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0;}
+  .fx-item__code{display:block;font-size:16px;font-weight:800;color:var(--ink);line-height:1.2;}
+  .fx-item__name{display:block;font-size:12px;color:var(--muted);}
+  .fx-rates{display:flex;align-items:stretch;background:none;border-radius:0;}
+  .fx-rates > div{padding:2px 0 2px 18px;text-align:right;}
+  .fx-rates > div + div{border-left:1px solid var(--line);margin-left:18px;}
+  .fx-label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+  .fx-value{display:block;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.6px;line-height:1.15;}
+  .fx-item__foot{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:12px;color:var(--muted);}
+  .fx-item__foot b{color:var(--ink);font-weight:800;}
+  @media (max-width:1100px){ .fx-row{grid-template-columns:1fr;gap:14px;} }
+  @media (max-width:900px){ .fx-head h2{font-size:28px;} }
+  @media (max-width:420px){ .fx-item{flex-wrap:wrap;} .fx-rates{width:100%;} .fx-rates > div{flex:1;text-align:left;} .fx-rates > div + div{padding-left:18px;} }
 
   /* ---------- HERO ---------- */
   .hero{position:relative;overflow:hidden;isolation:isolate;background:var(--bg);border-bottom:1px solid var(--line);}
@@ -292,7 +321,7 @@
       rgba(var(--scrim-rgb),.96) 0%, rgba(var(--scrim-rgb),.82) 42%,
       rgba(var(--scrim-rgb),.36) 66%, rgba(var(--scrim-rgb),0) 84%);}
   .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;
-    align-items:center;padding:170px 32px 140px;max-width:1280px;margin:0 auto;perspective:1200px;}
+    align-items:center;padding:150px 32px 120px;max-width:1280px;margin:0 auto;perspective:1200px;}
 
   /* lattice pattern: a star-and-cross net that draws itself in, then drifts almost imperceptibly */
   .ln{stroke-dasharray:1;stroke-dashoffset:1;will-change:stroke-dashoffset;}
@@ -338,7 +367,39 @@
     .phone.p3{transform:rotate(8deg) translateX(70px);}
     .phone .screen::after{animation:none!important;opacity:0!important;}
   }
+
+  /* ---------- HERO CARD FAN ----------
+     Three independent card PNGs stacked in the centre; scroll position
+     (see the AnimatedBankCards script) fans them open. Outer .hero-card
+     takes the scroll transform, inner .hero-card__float takes the idle
+     float, so the two never fight over `transform`. */
+  .hero-card-visual{position:relative;width:min(600px,100%);aspect-ratio:1/.9;margin:0 auto;perspective:1200px;
+    animation:cardsIn 1.1s cubic-bezier(.22,1,.36,1) .1s both;}
+  .hero-card-visual::before{content:"";position:absolute;inset:-6% -8%;z-index:0;pointer-events:none;
+    background:radial-gradient(48% 48% at 46% 50%, rgba(220,233,216,.10) 0%, rgba(220,233,216,0) 70%),
+               radial-gradient(38% 38% at 66% 62%, rgba(200,143,39,.08) 0%, rgba(200,143,39,0) 70%);}
+  .hero-card{position:absolute;left:9%;top:50%;width:82%;margin-top:-30.75%;z-index:var(--z);
+    aspect-ratio:1448/1086;will-change:transform;transform-origin:50% 50%;
+    filter:drop-shadow(0 12px 24px rgba(0,0,0,.10));}
+  .hero-card--black{--z:3;} .hero-card--green{--z:2;} .hero-card--back{--z:1;}
+  .hero-card__float{width:100%;height:100%;animation:cardFloat 5s ease-in-out infinite alternate;}
+  .hero-card--green .hero-card__float{animation-duration:6s;animation-delay:-2s;}
+  .hero-card--back .hero-card__float{animation-duration:4.5s;animation-delay:-1s;}
+  .hero-card__float img{display:block;width:100%;height:auto;}
+  @keyframes cardFloat{from{transform:translateY(calc(var(--float,0px) * -1));}to{transform:translateY(var(--float,0px));}}
+  @keyframes cardsIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+  @media (max-width:900px){ .hero-card-visual{margin-top:20px;width:min(440px,100%);} }
+  @media (prefers-reduced-motion:reduce){
+    .hero-card-visual{animation:none;}
+    .hero-card__float{animation:none!important;}
+  }
   .hero h1{font-size:46px;line-height:1.2;font-weight:800;color:var(--ink);margin:0 0 20px;letter-spacing:-.5px;}
+  @keyframes heroRise{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
+  .hero-inner > div:first-child > *{animation:heroRise 1s var(--ease) both;}
+  .hero-inner > div:first-child > :nth-child(2){animation-delay:.1s;}
+  .hero-inner > div:first-child > :nth-child(3){animation-delay:.2s;}
+  .hero-inner > div:first-child > :nth-child(4){animation-delay:.3s;}
+  @media (prefers-reduced-motion: reduce){ .hero-inner > div:first-child > *{animation:none;} }
   .hero p.lead{font-size:19px;line-height:1.5;color:var(--body-text);margin:0 0 28px;max-width:460px;}
   .store-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
   .store-badge{display:block;width:148px;height:44px;object-fit:fill;transition:transform var(--dur-s) var(--ease);}
@@ -360,221 +421,340 @@
     border:5px solid #facc15;border-radius:50%;}
 
   /* ---------- SECTION SHARED ---------- */
-  section{padding:64px 0;}
+  section{padding:var(--section-y) 0;}
+  @media (max-width:900px){ :root{--section-y:64px;} }
   .section-head{display:flex;gap:32px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:36px;}
   .section-head h2{font-size:34px;line-height:1.25;font-weight:800;color:var(--ink);margin:0;max-width:620px;letter-spacing:-.3px;}
   .section-head p{font-size:18px;line-height:1.55;color:var(--body-text);margin:0;max-width:520px;}
   .section-head.on-color h2, .section-head.on-color p{color:#fff;}
   .section-head.on-color p{color:#eef2f6;}
 
-  /* ---------- PRODUCTS ---------- */
+  /* ---------- PRODUCTS (about-style) ---------- */
   .products-section{padding-bottom:0;}
-  .btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;
-    font-weight:700;font-size:16px;padding:11px 22px;border-radius:8px;border:none;
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--forest);color:#fff;
+    font-weight:700;font-size:16px;padding:11px 22px;border-radius:var(--radius-btn);border:none;
     transition:transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease), background-color var(--dur-s) var(--ease);}
-  .btn-primary:hover{background:var(--navy-dark);transform:translateY(-2px);box-shadow:0 10px 20px -8px rgba(1,68,147,.45);}
+  .btn-primary:hover{background:var(--forest-deep);transform:translateY(-2px);box-shadow:0 10px 20px -8px rgba(5,42,37,.4);}
   .btn-primary:active{transform:translateY(0);box-shadow:none;}
-  .products-section .btn-primary{display:flex;width:fit-content;margin:32px auto 0;}
+  .products-section .btn-primary{display:flex;width:fit-content;margin:40px auto 0;}
   @media (prefers-reduced-motion: reduce){ .btn-primary{transition:none;} .btn-primary:hover{transform:none;} }
-  /* static 3-up grid instead of a horizontal-scroll strip — with exactly 3
-     cards there's nothing to actually scroll, so a scrollbar + a sliver of
-     the 3rd card peeking off-edge just reads as broken. All 3 show fully;
-     nothing to swipe or drag. */
-  .cards-scroll{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
-  .pcard{height:480px;border-radius:20px;position:relative;overflow:hidden;isolation:isolate;
-    display:flex;align-items:flex-end;}
-  .pcard__media{position:absolute;inset:0;z-index:0;transition:transform var(--dur-l) var(--ease);will-change:transform;}
-  .pcard.c1 .pcard__media{background:linear-gradient(155deg,#0b3f83,#012a5c);}
-  .pcard.c2 .pcard__media{background:linear-gradient(155deg,#0d5a3f,#053824);}
-  .pcard.c3 .pcard__media{background:linear-gradient(155deg,#4a2e7d,#241443);}
-  .pcard__scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(to top, rgba(0,0,0,.96) 0%, rgba(0,0,0,.78) 42%, rgba(0,0,0,.22) 75%, rgba(0,0,0,0) 95%);}
-  .pcard:hover .pcard__media, .pcard:focus-within .pcard__media{transform:scale(1.07);}
-  .pcard__content{position:relative;z-index:2;padding:26px;color:#fff;}
-  .pcard__eyebrow{display:block;font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
-    color:#facc15;margin-bottom:10px;}
-  .pcard h3{font-size:21px;font-weight:800;margin:0 0 8px;color:#fff;}
-  .pcard p{font-size:14.5px;color:rgba(255,255,255,.82);margin:0;line-height:1.55;}
-  @media (prefers-reduced-motion: reduce){ .pcard__media{transition:none;} .pcard:hover .pcard__media{transform:none;} }
 
-  /* ---------- FEATURES / TABS ---------- */
+  .about-head__left{display:flex;flex-direction:column;gap:14px;max-width:620px;}
+  .about-head__left .badge-pill{margin-bottom:0;}
+  .about-head p{padding-top:6px;}
+
+  .about-features{display:grid;grid-template-columns:repeat(3,1fr);gap:32px 28px;margin-top:44px;}
+  .about-feature__icon{display:flex;align-items:center;justify-content:center;width:52px;height:52px;
+    border-radius:50%;background:var(--forest);color:#fff;margin-bottom:18px;}
+  .about-feature__icon i{width:24px;height:24px;}
+  .about-feature h3{font-size:19px;font-weight:800;color:var(--ink);margin:0 0 8px;letter-spacing:-.1px;}
+  .about-feature p{font-size:15px;line-height:1.6;color:var(--body-text);margin:0;}
+
+  /* Scroll-expand image: starts narrower + more rounded, and grows to a
+     full-bleed, edge-to-edge width with square corners as it travels
+     through the viewport — the effect read off securevest.netlify.app's
+     about section (there it's a GSAP ScrollTrigger scrub on width/
+     border-radius; here it's a plain scroll-position tween via rAF, see
+     the script near the bottom). It lives outside .wrap, as a direct
+     child of the full-width <section>, so 100% naturally reaches the
+     viewport edges — no breakout hack needed. */
+  .about-img{margin:48px auto 0;width:78%;border-radius:28px;overflow:hidden;
+    aspect-ratio:16/7.2;will-change:width,border-radius;}
+  .about-img img, .about-img video{width:100%;height:100%;object-fit:cover;display:block;}
+  html:not(.has-js) .about-img{width:100%;max-width:1216px;border-radius:20px;}
+  @media (prefers-reduced-motion: reduce){ .about-img{width:100%!important;max-width:100%!important;border-radius:0!important;} }
+  @media (max-width:900px){
+    .about-features{grid-template-columns:1fr;gap:28px;}
+    .about-img{width:92%!important;max-width:92%!important;border-radius:20px!important;aspect-ratio:4/3;}
+  }
+
+  /* ---------- FEATURES / CAROUSEL ---------- */
+  /* a draggable, snap-scrolling strip alternating plain photo slides with
+     content cards (eyebrow, heading, description, checklist, CTA) — the
+     card-carousel pattern read off securevest.netlify.app's benefits
+     section, with our own Shariah-compliant services as the content. */
   .features-section{padding-bottom:0;}
-  .features-panel{position:relative;isolation:isolate;background:transparent;padding:64px 0;}
+  .features-panel{position:relative;isolation:isolate;background:transparent;padding:0;}
   .features-panel > .section-head{flex-direction:column;align-items:center;text-align:center;}
-  .features-panel > .section-head h2, .features-panel > .section-head p{max-width:700px;margin-left:auto;margin-right:auto;}
-  /* storytelling backdrop: starts at the page's normal container width and
-     grows edge-to-edge to the full page width as the user scrolls through —
-     the literal width-grow read off securevest.netlify.app's About section,
-     applied to this panel's background instead of a photo. `left:50% +
-     translateX(-50%)` keeps it centered on the viewport at any width since
-     .wrap (its centered ancestor) is itself centered on the page; only
-     --bg-width (a px value JS updates every scroll frame) changes, so
-     nothing else on the page reflows. */
-  .features-panel__bg{position:absolute;top:var(--bg-inset-y,0px);bottom:var(--bg-inset-y,0px);left:50%;
-    width:var(--bg-width, 100%);transform:translateX(-50%);
-    z-index:-1;pointer-events:none;
-    background:#F2FAF5;border-radius:var(--bg-radius,32px);
-    will-change:width,top,bottom,border-radius;}
-  .features-panel > :not(.features-panel__bg):not(.tabs){padding:0px;}
-  /* single pill-shaped bar, bordered, white/off-white — only the active tab
-     gets a filled background (brand navy, reused from its existing role
-     rather than copying a new color); inactive tabs sit directly on the
-     bar's own background and are separated from each other by hairline
-     dividers, the same border-as-separator pattern already used for
-     .stats-grid / .partners-box. */
-  .tabs{display:flex;align-items:center;gap:6px;width:fit-content;max-width:100%;margin:0 auto 32px;
-    flex-wrap:wrap;justify-content:center;position:relative;overflow:hidden;
-    background:var(--card-bg);border:1px solid var(--line);border-radius:999px;padding:8px;}
-  .tab{position:relative;z-index:1;padding:13px 24px;min-height:44px;border-radius:999px;
-    font-weight:700;font-size:15.5px;border:none;background:transparent;color:var(--tab-inactive);
-    white-space:nowrap;transition:background-color var(--dur-m) var(--ease), color var(--dur-m) var(--ease), box-shadow var(--dur-m) var(--ease);}
-  .tab:not(:last-child)::after{content:"";position:absolute;right:-3.5px;top:50%;transform:translateY(-50%);
-    width:1px;height:16px;background:var(--line);}
-  .tab.active{background:#009136;color:#fff;}
-  .tab:hover:not(.active){color:var(--navy);}
-  @media (prefers-reduced-motion: reduce){ .tab{transition:none;} }
-  .tab-body{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;}
-  .tab-body h3{font-size:27px;font-weight:800;color:var(--ink);margin:0 0 14px;line-height:1.3;}
-  .check-list{display:flex;flex-direction:column;gap:9px;margin-bottom:20px;}
-  .check-list .item{display:flex;gap:10px;align-items:center;background:var(--card-bg);padding:10px 12px;
-    border-radius:8px;font-size:15.5px;color:var(--body-text);}
-  .check-list .bullet{width:20px;height:20px;border-radius:50%;background:var(--green);display:flex;
-    align-items:center;justify-content:center;flex-shrink:0;}
-  .check-list .bullet svg{width:11px;height:11px;color:#fff;}
-  .btn-outline{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--navy);color:var(--navy);
-    font-weight:700;font-size:15px;padding:10px 20px;border-radius:8px;background:transparent;
-    transition:background-color var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);}
-  .btn-outline:hover{background:rgba(1,68,147,.06);transform:translateY(-2px);}
-  .btn-outline:active{transform:translateY(0);}
-  @media (prefers-reduced-motion: reduce){ .btn-outline{transition:none;} .btn-outline:hover{transform:none;} }
-  .card-visual{border-radius:18px;height:340px;background:linear-gradient(150deg,#1b1b1b,#33322f);
-    display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
-  .card-visual__scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(to top, rgba(0,0,0,.96) 0%, rgba(0,0,0,.78) 42%, rgba(0,0,0,.22) 75%, rgba(0,0,0,0) 95%);}
-  .card-visual__desc{position:absolute;left:0;right:0;bottom:0;z-index:2;margin:0;
-    padding:22px 24px;color:#fff;font-size:15px;line-height:1.6;}
+  .features-panel > .section-head h2{max-width:880px;margin-left:auto;margin-right:auto;}
+  .features-panel > .section-head p{max-width:700px;margin-left:auto;margin-right:auto;}
+  /* full-bleed breakout: escapes .wrap's max-width to run edge-to-edge with
+     the viewport, the same "full width" treatment read off
+     securevest.netlify.app, reused below for the carousel-nav strip too. */
+  .carousel-bleed{width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);}
+  .carousel{position:relative;margin-top:8px;}
+  .carousel-track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;
+    cursor:grab;-webkit-overflow-scrolling:touch;
+    padding:4px 0 10px;
+    scrollbar-width:none;-ms-overflow-style:none;}
+  .carousel-track::-webkit-scrollbar{display:none;}
+  .carousel-track.dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto;user-select:none;}
+  /* image-first cards: photo fills the card, copy sits on a forest-green
+     gradient overlay at the bottom */
+  .carousel-slide{flex:0 0 auto;scroll-snap-align:center;border-radius:var(--radius-card);position:relative;overflow:hidden;
+    width:min(920px, 88vw);height:520px;background:#000;isolation:isolate;
+    border:1px solid var(--border-soft);}
+  .carousel-slide-media{position:absolute;inset:0;z-index:0;}
+  .carousel-slide-media img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;
+    transition:transform var(--dur-l) var(--ease);}
+  .carousel-slide:hover .carousel-slide-media img{transform:scale(1.04);}
+  .carousel-slide::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to top, rgba(0,0,0,.94) 0%, rgba(0,0,0,.8) 38%, rgba(0,0,0,.45) 62%, rgba(0,0,0,0) 85%);}
+  .drag-badge{position:absolute;top:18px;left:18px;z-index:2;background:var(--navy);color:#fff;
+    font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+    padding:9px 20px;border-radius:999px;pointer-events:none;}
+  .carousel-slide-body{position:absolute;left:0;bottom:0;z-index:2;width:100%;max-width:none;padding:40px;display:flex;flex-direction:column;gap:10px;}
+  .carousel-eyebrow{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-gold);}
+  .carousel-slide-body h3{font-size:27px;font-weight:800;color:#fff;margin:0;line-height:1.25;}
+  .carousel-slide-body > p{max-width:none;font-size:15px;color:var(--sage);line-height:1.55;margin:0;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .carousel-slide-body .check-list{display:none;}
+  .carousel-slide-body .btn-primary{width:fit-content;margin-top:4px;background:none;padding:0;min-height:0;
+    color:#fff;font-size:14px;border-radius:0;box-shadow:none;transform:none;}
+  .carousel-slide-body .btn-primary:hover{background:none;color:var(--brand-gold);transform:none;box-shadow:none;}
+  .carousel-slide-body .btn-primary svg{stroke:currentColor;transition:transform var(--dur-s) var(--ease);}
+  .carousel-slide-body .btn-primary:hover svg{transform:translateX(3px);}
+  .carousel-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:28px;}
+  .carousel-arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);
+    display:flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer;flex-shrink:0;
+    transition:background-color var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease), color var(--dur-s) var(--ease);}
+  .carousel-arrow:hover{background:rgba(1,68,147,.06);border-color:var(--navy);color:var(--navy);}
+  .carousel-arrow svg{width:18px;height:18px;}
+  .carousel-counter{font-size:14px;font-weight:700;color:var(--muted);min-width:44px;text-align:center;}
+  .carousel-counter #carouselCurrent{color:var(--ink);}
+  @media (prefers-reduced-motion: reduce){ .carousel-track{scroll-behavior:auto;} .carousel-arrow{transition:none;} }
+  @media (max-width:760px){
+    .carousel-slide{width:86vw;height:520px;}
+    .carousel-slide-body{padding:24px;}
+  }
+  @media (max-width:640px){
+    .carousel-track{padding-left:0;padding-right:0;}
+    .carousel-slide-body h3{font-size:21px;}
+  }
   /* ---------- QUICK ACCESS ---------- */
-  /* row-select layout: a plain list of services on the left, and on the
-     right a single visual — the shared photo as the background, the
-     selected service's content overlaid on top of it via a bottom scrim —
-     the same media+scrim+content overlap used by .pcard in the Products
-     section, reused here instead of two separate boxes. */
-  .quick{background:var(--navy);color:#fff;}
-  .qa-layout{display:grid;grid-template-columns:1fr 2fr;gap:24px;align-items:stretch;}
-  .qa-list{display:flex;flex-direction:column;gap:14px;}
-  .qa-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:1;
-    padding:22px 24px;border-radius:12px;background:rgba(255,255,255,.08);
-    color:#fff;font-weight:700;font-size:16px;text-align:left;
-    transition:background-color var(--dur-m) var(--ease), transform var(--dur-xs) var(--ease);}
-  .qa-row svg{width:18px;height:18px;flex-shrink:0;opacity:.85;transition:transform var(--dur-m) var(--ease);}
-  .qa-row.active{background:rgba(255,255,255,.22);}
-  .qa-row.active svg{transform:translateX(3px);}
-  .qa-row:hover:not(.active){background:rgba(255,255,255,.14);}
-  .qa-row:active{transform:scale(.98);}
-  @media (prefers-reduced-motion: reduce){ .qa-row, .qa-row svg{transition:none;} .qa-row:active{transform:none;} .qa-row.active svg{transform:none;} }
-  .qa-visual{position:relative;border-radius:16px;overflow:hidden;isolation:isolate;min-height:380px;}
-  .qa-visual img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:0;
+  /* Click-to-toggle accordion inside a single full-bleed dark-navy card —
+     the "Financial Rails for Global Expansion" pattern off
+     securevest.netlify.app/index-three (their green card, our navy brand
+     color): title/subtitle in a 50/50 left column, the service rows in
+     the right column, plus/minus swapping to mark each row's state. */
+  .quick{background:var(--paper);}
+  #quickDuplicate{padding-bottom:0;}
+  .quick-card{position:relative;overflow:hidden;isolation:isolate;
+    background:linear-gradient(160deg,var(--navy) 0%,var(--navy-dark) 100%);
+    border:1px solid rgba(255,255,255,.16);border-radius:28px;padding:56px 48px;}
+  .quick-card::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.10), transparent 60%);}
+  .quick-card__grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+  .quick-card__head h2{color:#fff;font-size:32px;font-weight:800;line-height:1.25;margin:0 0 14px;letter-spacing:-.3px;}
+  .quick-card__head p{color:rgba(255,255,255,.75);font-size:17px;line-height:1.6;margin:0;}
+  .qa-list{display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.18);
+    border-radius:14px;overflow:hidden;}
+  .qa-item{border-bottom:1px solid rgba(255,255,255,.16);
+    transition:background-color var(--dur-m) var(--ease);}
+  .qa-item:last-child{border-bottom:none;}
+  .qa-item.active{background-color:rgba(255,255,255,.10);}
+  .qa-row{display:flex;align-items:center;gap:18px;width:100%;padding:18px 20px;
+    background:none;border:0;text-align:left;cursor:pointer;}
+  .qa-row-icon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;
+    border-radius:50%;background:rgba(255,255,255,.12);color:#fff;flex-shrink:0;
+    transition:background var(--dur-m) var(--ease);}
+  .qa-row-icon svg{width:20px;height:20px;}
+  .qa-row-title{flex:1;font-size:18px;font-weight:700;color:#fff;}
+  .qa-row-toggle{position:relative;width:40px;height:40px;color:#fff;flex-shrink:0;}
+  .qa-row-toggle svg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:18px;height:18px;transition:opacity var(--dur-s) var(--ease);}
+  .qa-row-toggle .icon-minus{opacity:0;}
+  .qa-item.active .qa-row-icon{background:rgba(255,255,255,.22);}
+  .qa-item.active .qa-row-toggle .icon-plus{opacity:0;}
+  .qa-item.active .qa-row-toggle .icon-minus{opacity:1;}
+  .qa-content{margin:0 20px 0 82px;max-height:0;overflow:hidden;transition:max-height var(--dur-m) var(--ease);}
+  .qa-item.active .qa-content{max-height:220px;}
+  .qa-content-body{display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding:0 0 22px;}
+  .qa-content-body p{font-size:14px;color:rgba(255,255,255,.75);line-height:1.6;margin:0;max-width:440px;}
+  .qa-content-body .btn-primary{width:fit-content;background:#fff;color:var(--navy);}
+  .qa-content-body .btn-primary:hover{background:rgba(255,255,255,.88);}
+  @media (prefers-reduced-motion: reduce){ .qa-item, .qa-row-icon, .qa-row-toggle svg, .qa-content{transition:none;} }
+  @media (max-width:900px){
+    .quick-card__grid{grid-template-columns:1fr;gap:32px;}
+  }
+  @media (max-width:640px){
+    .quick-card{padding:36px 22px;border-radius:20px;}
+    .quick-card__head h2{font-size:26px;}
+    .qa-row{gap:14px;padding:16px;}
+    .qa-content{margin:0 16px;}
+  }
+
+  /* Numbered service cards — "Key Services Overview" pattern off
+     securevest.netlify.app: icon top-left, a large ghost index number
+     top-right, title, a divider, then a short description. Light cards on
+     the page background, reusing the eyebrow+heading/description split
+     from .section-head. */
+  .quick-head__left{display:flex;flex-direction:column;max-width:620px;}
+  /* Connected card group — a single shared outer border/radius (like the
+     Quick Access accordion) instead of gapped separate cards, and each
+     card fills with the brand-navy gradient on hover, inverting its text,
+     icon and ghost number to light — the "Key Services" hover treatment
+     read off the reference. */
+  .qa-grid{display:grid;grid-template-columns:repeat(4,1fr);
+    border:1px solid var(--line);border-radius:20px;overflow:hidden;}
+  .qa-card{position:relative;overflow:hidden;background:var(--card-bg);padding:36px 28px 32px;
+    border-right:1px solid var(--line);
+    transition:background var(--dur-m) var(--ease);}
+  .qa-card:nth-child(4n){border-right:none;}
+  .qa-card::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
+    background:linear-gradient(160deg,var(--navy) 0%,var(--navy-dark) 100%);
     transition:opacity var(--dur-m) var(--ease);}
-  @media (prefers-reduced-motion: reduce){ .qa-visual img{transition:none;} }
-  .qa-visual-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(to top, rgba(0,0,0,.96) 0%, rgba(0,0,0,.78) 42%, rgba(0,0,0,.22) 75%, rgba(0,0,0,0) 95%);}
-  .qa-panels{position:relative;z-index:2;height:100%;padding:32px;}
-  .qa-panel{display:none;flex-direction:column;justify-content:flex-end;height:100%;}
-  .qa-panel.active{display:flex;}
-  .qa-panel.active .qa-panel-foot{animation:qaFadeIn var(--dur-l) var(--ease);}
-  @keyframes qaFadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-  @media (prefers-reduced-motion: reduce){ .qa-panel.active .qa-panel-foot{animation:none;} }
-  .qa-panel-foot{display:grid;grid-template-columns:60% 40%;align-items:center;gap:20px;}
-  .qa-panel-foot p{font-size:15px;color:rgba(255,255,255,.82);line-height:1.6;margin:0;}
-  .qa-panel .btn-primary{width:fit-content;justify-self:end;}
-  @media (max-width:640px){ .qa-panel-foot{grid-template-columns:1fr;} .qa-panel .btn-primary{justify-self:start;} .qa-panel-foot p{margin:0 0 16px;} }
-  @media (max-width:1024px){ .qa-layout{grid-template-columns:1fr;} .qa-visual{order:-1;min-height:300px;} }
+  .qa-card:hover::before{opacity:1;}
+  .qa-card__top{position:static;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  .qa-card__icon{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;width:56px;height:56px;
+    border-radius:14px;background:rgba(1,68,147,.1);color:var(--navy);flex-shrink:0;
+    transition:background var(--dur-m) var(--ease), color var(--dur-m) var(--ease);}
+  .qa-card__icon svg{width:28px;height:28px;}
+  .qa-card__img{position:relative;z-index:1;display:block;width:100%;max-width:200px;height:170px;object-fit:contain;object-position:left center;transition:transform var(--dur-m) var(--ease);}
+  .qa-card:hover .qa-card__img{transform:translateY(-10px) rotate(-3deg) scale(1.08);}
+  .qa-card__img{transition:transform .55s cubic-bezier(.22,1,.36,1);transform-origin:50% 80%;}
+  /* light sweep across the card on hover */
+  .qa-card::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;z-index:0;pointer-events:none;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.14),transparent);transform:skewX(-18deg);}
+  .qa-card:hover::after{left:130%;transition:left .9s var(--ease);}
+  /* number drifts, title lifts, divider draws in gold, CTA arrow nudges */
+  .qa-card__ghost{transition:transform .5s var(--ease), color var(--dur-m) var(--ease), -webkit-text-stroke-color var(--dur-m) var(--ease);}
+  .qa-card:hover .qa-card__ghost{transform:translate(-6px,6px);}
+  .qa-card__title{transition:transform var(--dur-m) var(--ease), color var(--dur-m) var(--ease);}
+  .qa-card:hover .qa-card__title{transform:translateY(-3px);}
+  .qa-card__divider::after{content:"";position:absolute;left:0;top:0;height:100%;width:0;background:var(--brand-gold);
+    transition:width .6s var(--ease);}
+  .qa-card:hover .qa-card__divider::after{width:100%;}
+  @media (prefers-reduced-motion: reduce){
+    .qa-card:hover .qa-card__img, .qa-card:hover .qa-card__ghost, .qa-card:hover .qa-card__title{transform:none;}
+    .qa-card::after, .qa-card__divider::after{display:none;}
+  }
+  .qa-card:hover .qa-card__icon{background:rgba(255,255,255,.18);color:#fff;}
+  /* Hollow/outlined numerals (not a solid light fill) — matches the
+     reference's stroke-only "01" watermark. color is the non-webkit
+     fallback (a faint solid fill); the @supports block hides that fill
+     and draws only the stroke where the browser can do it. */
+  .qa-card__ghost{position:absolute;top:-12px;right:-8px;font-size:84px;font-weight:800;line-height:1;letter-spacing:-2px;color:var(--line);pointer-events:none;
+    white-space:nowrap;transition:color var(--dur-m) var(--ease), -webkit-text-stroke-color var(--dur-m) var(--ease);}
+  .qa-card:hover .qa-card__ghost{color:rgba(255,255,255,.16);}
+  @supports (-webkit-text-stroke: 1px black){
+    .qa-card__ghost{color:transparent;-webkit-text-stroke:1px rgba(16,24,40,.09);}
+    .qa-card:hover .qa-card__ghost{color:transparent;-webkit-text-stroke-color:rgba(255,255,255,.4);}
+  }
+  .qa-card__title{position:relative;z-index:1;font-size:18px;font-weight:800;color:var(--ink);margin:16px 0 16px;
+    transition:color var(--dur-m) var(--ease);}
+  .qa-card:hover .qa-card__title{color:#fff;}
+  .qa-card__divider{position:relative;z-index:1;height:1px;background:var(--line);margin-bottom:16px;
+    transition:background var(--dur-m) var(--ease);}
+  .qa-card:hover .qa-card__divider{background:rgba(255,255,255,.22);}
+  .qa-card p{position:relative;z-index:1;font-size:14px;line-height:1.6;color:var(--body-text);margin:0 0 18px;
+    transition:color var(--dur-m) var(--ease);}
+  .qa-card:hover p{color:rgba(255,255,255,.78);}
+  .qa-card__cta{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;
+    font-size:14px;font-weight:700;color:var(--forest);transition:color var(--dur-m) var(--ease);}
+  .qa-card__cta svg{width:14px;height:14px;transition:transform var(--dur-m) var(--ease);}
+  .qa-card__cta:hover svg{transform:translateX(3px);}
+  .qa-card:hover .qa-card__cta{color:#fff;}
+  @media (prefers-reduced-motion: reduce){
+    .qa-card, .qa-card::before, .qa-card__icon, .qa-card__ghost, .qa-card__title, .qa-card__divider, .qa-card p, .qa-card__cta, .qa-card__cta svg{transition:none;}
+  }
+  @media (max-width:900px){
+    .qa-grid{grid-template-columns:repeat(2,1fr);}
+    .qa-card{border-right:1px solid var(--line);border-bottom:1px solid var(--line);}
+    .qa-card:nth-child(4n){border-right:1px solid var(--line);}
+    .qa-card:nth-child(2n){border-right:none;}
+    .qa-card:nth-child(n+3){border-bottom:none;}
+  }
+  @media (max-width:640px){
+    .qa-grid{grid-template-columns:1fr;}
+    .qa-card, .qa-card:nth-child(4n), .qa-card:nth-child(2n), .qa-card:nth-child(n+3){
+      border-right:none;border-bottom:1px solid var(--line);}
+    .qa-card:last-child{border-bottom:none;}
+  }
 
   /* ---------- STATS ---------- */
-  /* Photo background with a darker brand-color overlay, and a frosted-glass
-     card block sitting on top of it: translucent white fill + backdrop-blur
-     so the image reads through, a soft light border standing in for the
-     glass edge, and light/white text since the surface no longer provides
-     its own opaque contrast — the overlay underneath is what keeps it
-     readable regardless of what part of the photo sits behind any given
-     letter. */
-  .stats-section{position:relative;overflow:hidden;isolation:isolate;padding:64px 0;background:#012046;}
-  .stats-section__video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;}
-  .stats-section__scrim{position:absolute;inset:0;z-index:0;pointer-events:none;
-    background:linear-gradient(160deg, rgba(1,32,70,.3), rgba(0,56,35,.3));}
-  .stats-section > .wrap{position:relative;z-index:1;}
-  /* One unified block, cells sharing hairline dividers instead of gapped
-     separate cards — same layout as before, now in glass instead of solid
-     white. Two explicit rows — 3 cells then 4 — rather than one grid with a
-     row-spanning headline, so the count per row is exact regardless of
-     content width. */
-  .stats-grid{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
-    border-radius:16px;overflow:hidden;box-shadow:0 24px 60px -24px rgba(0,0,0,.55);
-    backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);}
-  .stats-row{display:grid;}
-  .stats-row + .stats-row{border-top:1px solid rgba(255,255,255,.2);}
-  .stats-row--head{grid-template-columns:2fr 1fr 1fr;}
-  .stats-row--figures{grid-template-columns:repeat(4,1fr);}
-  .stats-row > *:not(:last-child){border-right:1px solid rgba(255,255,255,.2);}
-  .stat-headline{display:flex;align-items:center;padding:30px;}
-  .stat-headline h2{font-size:32px;font-weight:800;color:#fff;margin:0;line-height:1.25;}
-  .stat-box{padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-    transition:background-color var(--dur-m) var(--ease);}
-  .stat-box:hover{background-color:rgba(255,255,255,.08);}
-  .stat-box .icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;}
-  .stat-box .icon svg{width:24px;height:24px;}
-  .stat-box .num{font-size:32px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
-  .stat-box .lbl{font-size:14px;color:rgba(255,255,255,.72);}
-  @media (max-width:800px){
-    .stats-row--head{grid-template-columns:1fr 1fr;}
-    .stat-headline{grid-column:1/3;border-right:none!important;border-bottom:1px solid rgba(255,255,255,.2);}
-    .stats-row--figures{grid-template-columns:1fr 1fr;}
-    .stats-row--figures .stat-box:nth-child(2n){border-right:none;}
-    .stats-row--figures .stat-box:nth-child(-n+2){border-bottom:1px solid rgba(255,255,255,.2);}
+  /* Centered headline over a row of white stat cards flanking a photo that
+     hangs both above and below the row (taller than the cards, centered,
+     symmetric negative margins) — the "Get the Coverage you Need" pattern.
+     The section's own background is a hard-stop gradient — #E5F4EB (same
+     mint as the Quick Access section above, so the two read as one
+     continuous band) transitioning to white partway down — so the card
+     row visually straddles the green/white seam instead of sitting fully
+     inside either color. */
+  .stats-section{background:var(--paper);}
+  .stats-head{text-align:center;max-width:760px;margin:0 auto 44px;}
+  .stats-head h2{font-size:34px;font-weight:800;color:var(--ink);margin:0;line-height:1.25;}
+  /* bento: two photos and four solid brand-colour stat tiles, checkerboarded */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:minmax(270px,auto);gap:20px;}
+  .stat-card{display:flex;flex-direction:column;justify-content:space-between;gap:36px;padding:28px;
+    border-radius:var(--radius-card);color:#fff;background:var(--forest);}
+  .stat-card--blue{background:var(--brand-blue);}
+  .stat-card__icon{width:56px;height:56px;display:flex;align-items:center;justify-content:center;
+    background:none;color:var(--brand-gold);}
+  .stat-card__icon svg{width:52px;height:52px;stroke-width:1.5;}
+  .stat-card__num{font-size:44px;line-height:1.05;font-weight:800;letter-spacing:-1.2px;color:#fff;margin-bottom:8px;}
+  .stat-card__lbl{font-size:16px;color:var(--sage);}
+  .stats-photo{position:relative;grid-column:span 2;border-radius:var(--radius-card);overflow:hidden;background:#fff;
+    border:1px solid var(--border-soft);}
+  .stats-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+  @media (max-width:900px){
+    .stats-row{grid-template-columns:1fr 1fr;grid-auto-rows:auto;}
+    .stats-photo{grid-column:1/3;aspect-ratio:16/9;}
+    .stat-card{min-height:230px;}
   }
-  @media (prefers-reduced-motion: reduce){ .stat-box{transition:none;} }
-  @media (max-width:640px){ .stats-section{padding:64px 0;} }
-  /* browsers without backdrop-filter get a more opaque glass fallback so
-     contrast doesn't depend on the blur actually happening */
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
-    .stats-grid{background:rgba(10,30,26,.62);}
+  @media (max-width:560px){
+    .stats-row{grid-template-columns:1fr;}
+    .stats-photo{grid-column:1/2;}
+    .stat-card__num{font-size:38px;}
   }
 
   /* ---------- PARTNERS ---------- */
-  .partners-box{display:flex;overflow:hidden;flex-wrap:wrap;}
-  .partners-head{flex:0 0 300px;padding:28px 32px 28px 0;background:var(--card-bg);border-right:1px solid var(--line);
-    display:flex;align-items:center;}
-  .partners-head h2{font-size:19px;font-weight:800;color:var(--ink);margin:0;line-height:1.3;}
-  .partners-body{flex:1;display:flex;align-items:center;justify-content:space-around;gap:32px;padding:10px 40px;
-    flex-wrap:wrap;background:var(--card-bg);}
-  .plogo{display:flex;align-items:center;opacity:.75;filter:grayscale(1);transition:opacity .2s ease-out, filter .2s ease-out;}
+  /* Infinite-scroll logo marquee: the track holds two identical copies of
+     the logo set back-to-back and animates translateX(0 -> -50%), so the
+     moment the first copy has scrolled fully offscreen the second copy is
+     sitting exactly where the first started — a seamless, gapless loop. */
+  .partners-section{padding-top:0;}
+  .partners-box{overflow:hidden;padding:32px 0;
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);}
+  .partners-track{display:flex;align-items:center;gap:72px;width:max-content;
+    animation:partners-scroll 56s linear infinite;}
+  .partners-box:hover .partners-track{animation-play-state:paused;}
+  .plogo{display:flex;align-items:center;flex-shrink:0;opacity:.75;filter:grayscale(1);
+    transition:opacity var(--dur-s) var(--ease), filter var(--dur-s) var(--ease);}
   .plogo:hover, .plogo:focus-within{opacity:1;filter:none;}
-  .plogo img{height:66px;width:auto;max-width:220px;object-fit:contain;transition:transform var(--dur-m) var(--ease);}
+  .plogo img{height:56px;width:auto;max-width:200px;object-fit:contain;transition:transform var(--dur-m) var(--ease);}
   .plogo:hover img, .plogo:focus-within img{transform:scale(1.08);}
-  @media (prefers-reduced-motion: reduce){ .plogo img{transition:none;} .plogo:hover img{transform:none;} }
+  @keyframes partners-scroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  @media (prefers-reduced-motion: reduce){
+    .partners-track{animation:none;}
+    .plogo img{transition:none;}
+    .plogo:hover img{transform:none;}
+  }
 
   /* ---------- APP PROMO ---------- */
-  .app-promo{position:relative;overflow:hidden;isolation:isolate;background:#e2f4ea;}
-  .app-promo__motif{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-  /* fades the pattern out behind the copy column so the heading/body text
-     stays clearly readable, the same radial-scrim technique the hero uses
-     to keep its own lattice pattern from competing with the headline. */
-  .app-promo__scrim{position:absolute;inset:0;z-index:0;pointer-events:none;
-    background:radial-gradient(60% 70% at 72% 50%,
-      rgba(226,244,234,.97) 0%, rgba(226,244,234,.85) 42%,
-      rgba(226,244,234,.4) 66%, rgba(226,244,234,0) 86%);}
-  .app-promo-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;}
-  .app-promo-visual img{display:block;width:100%;max-width:400px;margin:0 auto;
+  /* Green-to-lime gradient band, phone mockup anchored to the section's
+     bottom edge and pushed slightly past it so overflow:hidden crops its
+     foot off — the "rising from the bottom" treatment read off the
+     reference mobile-app promo. */
+  .app-promo{position:relative;overflow:hidden;isolation:isolate;
+    background:var(--forest);padding:32px 0 40px;}
+  .app-promo-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;
+    gap:40px;align-items:center;min-height:380px;}
+  .app-promo-visual{position:relative;align-self:stretch;}
+  .app-promo-visual img{position:absolute;left:0;right:0;bottom:-40px;margin:0 auto;
+    display:block;width:100%;max-width:560px;height:auto;
     transform:scale(.9);transform-origin:center bottom;will-change:transform;}
   @media (prefers-reduced-motion: reduce){ .app-promo-visual img{transform:none;} }
-  .app-promo-copy{padding:56px 0;}
-  .badge-pill{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--green);color:var(--green);
+  .app-promo-copy{padding:28px 0;}
+  .badge-pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:none;color:var(--ink);
     font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
     padding:6px 14px;border-radius:999px;margin-bottom:18px;}
-  .app-promo-copy h2{color:var(--ink);font-size:34px;font-weight:800;line-height:1.25;margin:0 0 16px;max-width:480px;}
-  .app-promo-copy p{color:var(--body-text);font-size:17px;line-height:1.6;margin:0 0 28px;max-width:460px;}
+  .app-promo-copy h2{color:#fff;font-size:34px;font-weight:800;line-height:1.25;margin:0 0 16px;max-width:480px;}
+  .app-promo-copy p{color:var(--sage);font-size:17px;line-height:1.6;margin:0 0 28px;max-width:460px;}
   @media (max-width:800px){
-    .app-promo-grid{grid-template-columns:1fr;text-align:center;}
+    .app-promo-grid{grid-template-columns:1fr;text-align:center;min-height:0;}
+    .app-promo-visual{min-height:420px;}
     .app-promo-copy{padding:0 0 40px;}
     .app-promo-copy p{margin-left:auto;margin-right:auto;}
     .app-promo-copy .store-row{justify-content:center;}
@@ -636,8 +816,6 @@
     .flast{align-items:flex-start;}
     .hero-inner{grid-template-columns:1fr;}
     .phones{margin-top:20px;}
-    .tab-body{grid-template-columns:1fr;}
-    .cards-scroll{grid-template-columns:1fr;}
   }
 
   /* ---------- FLOATING CONTACT BUTTON ---------- */
@@ -671,6 +849,347 @@
     .fab-item, .fab-toggle{transition:none;}
     .fab.open .fab-toggle, .fab.open .fab-toggle:hover{transform:none;}
   }
+
+  /* ---------- DESIGN SYSTEM: components + dark-green surfaces ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;
+    border-radius:var(--radius-btn);font-size:14px;font-weight:700;white-space:nowrap;border:1.5px solid transparent;
+    transition:background-color var(--dur-s) var(--ease), color var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);}
+  .btn svg{width:16px;height:16px;flex-shrink:0;}
+  .btn--lg{min-height:52px;padding:0 28px;font-size:16px;}
+  .btn--forest{background:var(--forest);color:#fff;}
+  .btn--forest:hover{background:var(--forest-deep);}
+  .btn--gold{background:var(--brand-gold);color:var(--ink);}
+  .btn--gold:hover{background:#d99a2c;transform:translateY(-1px);}
+  .btn--outline-light{background:transparent;color:#fff;border-color:rgba(220,233,216,.5);}
+  .btn--outline-light:hover{border-color:var(--brand-gold);color:var(--brand-gold);}
+  .btn--white{background:#fff;color:var(--forest);}
+  .btn--white:hover{background:var(--sage);}
+  @media (prefers-reduced-motion: reduce){ .btn{transition:none;} .btn--gold:hover{transform:none;} }
+
+  .card-lift{transition:transform var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease);}
+
+  /* hero: deep green, light copy, gold CTA */
+  .hero{--scrim-rgb:7,59,50;--motif-line-star:rgba(220,233,216,.10);--motif-line-cross:rgba(220,233,216,.07);
+    --motif-node:rgba(200,143,39,.10);background:var(--forest);border-bottom:none;}
+  .hero__grad{background:linear-gradient(160deg, var(--forest) 0%, var(--forest) 60%, #0a4a3f 100%);}
+  .hero h1{color:#fff;}
+  .hero p.lead{color:var(--sage);}
+  .hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin:0;}
+  @media (max-width:560px){ .hero-ctas .btn{width:100%;} }
+
+  /* footer: deepest green, gold accents */
+  footer{background:var(--forest-deep);}
+  .newsletter h3{color:#fff;}
+  .nl-form input{background:#fff;color:var(--ink);border-color:transparent;}
+  .nl-form input::placeholder{color:var(--text-secondary);}
+  .nl-form input:focus{background:#fff;border-color:var(--brand-gold);}
+  .nl-form button{background:var(--brand-gold);color:var(--ink);}
+  .nl-form button:hover{background:#d99a2c;}
+  .nl-form button svg{stroke:var(--ink);}
+  .footer-divider{background:rgba(220,233,216,.18);}
+  .footer-links-bar{border-color:rgba(220,233,216,.2);}
+  .footer-links-bar{background:var(--forest);}
+  .flink{background:var(--forest);}
+  .flink:hover{background:#0b4a3f;}
+  .flink:not(:last-child)::after{background:rgba(220,233,216,.2);}
+  .flink:first-child svg{stroke:var(--brand-gold);opacity:1;}
+  .fcol ul a:hover{color:var(--brand-gold);}
+  .fcol h4{color:#fff;}
+
+  /* transparent header over the dark hero: light text + light logo until the page scrolls */
+  .brand-logo--light{display:none;}
+  .nav:not(.scrolled) .brand-logo--dark{display:none;}
+  .nav:not(.scrolled) .brand-logo--light{display:block;}
+  .nav:not(.scrolled) .primary-nav .menu, .nav:not(.scrolled) .primary-nav .nav-item > a,
+  .nav:not(.scrolled) .primary-nav > a, .nav:not(.scrolled) .lang, .nav:not(.scrolled) .nav-toggle{color:#fff;}
+  .nav:not(.scrolled) .primary-nav .menu:hover, .nav:not(.scrolled) .primary-nav .nav-item > a:hover{color:var(--brand-gold);}
+  .nav:not(.scrolled) .btn--forest{background:#fff;color:var(--forest);}
+  .nav:not(.scrolled) .btn--forest:hover{background:var(--sage);}
+
+  /* ---------- PREMIUM MICRO-INTERACTIONS ---------- */
+  /* buttons: lift + light sweep */
+  .btn, .btn-primary{position:relative;overflow:hidden;isolation:isolate;}
+  .btn::after, .btn-primary::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:45%;z-index:-1;pointer-events:none;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);}
+  .btn:hover::after, .btn-primary:hover::after{left:130%;transition:left .8s var(--ease);}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(5,42,37,.45);}
+  .btn:active{transform:translateY(0);box-shadow:none;}
+  .btn--outline-light:hover{background:rgba(200,143,39,.1);}
+
+  /* header links: gold underline grows from the centre */
+  .primary-nav > a, .primary-nav .menu{position:relative;}
+  .primary-nav > a::after, .primary-nav .menu::after{content:"";position:absolute;left:12px;right:12px;bottom:6px;height:2px;border-radius:2px;
+    background:var(--brand-gold);transform:scaleX(0);transition:transform var(--dur-s) var(--ease);}
+  .primary-nav > a:hover::after, .primary-nav .menu:hover::after, .primary-nav .menu[aria-expanded="true"]::after{transform:scaleX(1);}
+
+  /* exchange cards: icon spins in, rates lift */
+  .fx-item__icon{transition:transform .6s cubic-bezier(.22,1,.36,1), background-color var(--dur-s) var(--ease);}
+  .fx-item:hover .fx-item__icon{transform:rotate(360deg) scale(1.06);background:var(--brand-gold);color:var(--ink);}
+  .fx-value{transition:transform var(--dur-s) var(--ease), color var(--dur-s) var(--ease);}
+  .fx-item:hover .fx-value{transform:translateY(-2px);color:var(--forest);}
+
+  /* about features: icon tile flips to solid, card lifts */
+  .about-feature{transition:transform var(--dur-s) var(--ease);}
+  .about-feature:hover{transform:translateY(-4px);}
+  .about-feature__icon{transition:transform .5s cubic-bezier(.22,1,.36,1), background-color var(--dur-s) var(--ease), color var(--dur-s) var(--ease);}
+  .about-feature:hover .about-feature__icon{transform:translateY(-3px) rotate(-6deg) scale(1.08);background:var(--brand-gold);color:var(--ink);}
+
+  /* stat tiles: lift, icon pops, glow follows in from a corner */
+  .stat-card{position:relative;overflow:hidden;isolation:isolate;transition:transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease);}
+  .stat-card::before{content:"";position:absolute;right:-30%;top:-40%;width:80%;height:80%;z-index:-1;pointer-events:none;border-radius:50%;
+    background:radial-gradient(circle,rgba(200,143,39,.28),rgba(200,143,39,0) 70%);opacity:0;transform:scale(.6);
+    transition:opacity .6s var(--ease), transform .6s var(--ease);}
+  .stat-card:hover{transform:translateY(-6px);box-shadow:0 22px 36px -22px rgba(5,42,37,.55);}
+  .stat-card:hover::before{opacity:1;transform:scale(1);}
+  .stat-card__icon{transition:transform .5s cubic-bezier(.22,1,.36,1), background-color var(--dur-s) var(--ease);}
+  .stat-card:hover .stat-card__icon{transform:scale(1.12) rotate(-8deg);}
+  .stats-photo img{transition:transform 1.1s var(--ease);}
+  .stats-photo:hover img{transform:scale(1.06);}
+
+  /* carousel cards: gold rule + text lift */
+  .carousel-slide-body{transition:transform .5s var(--ease);}
+  .carousel-slide:hover .carousel-slide-body{transform:translateY(-6px);}
+  .carousel-eyebrow{position:relative;width:fit-content;}
+  .carousel-eyebrow::after{content:"";position:absolute;left:0;bottom:-4px;height:2px;width:0;background:var(--brand-gold);transition:width .6s var(--ease);}
+  .carousel-slide:hover .carousel-eyebrow::after{width:100%;}
+  .carousel-arrow{transition:transform var(--dur-s) var(--ease), background-color var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease), color var(--dur-s) var(--ease);}
+  .carousel-arrow:hover{transform:scale(1.1);}
+
+  .carousel-slide-body .btn-primary::after{display:none;}
+
+  /* megamenu cards */
+  .megamenu-card{transition:transform var(--dur-s) var(--ease), background-color var(--dur-xs) var(--ease);}
+  .megamenu-card:hover{transform:translateX(4px);}
+  .megamenu-card-icon{transition:transform .5s cubic-bezier(.22,1,.36,1);}
+  .megamenu-card:hover .megamenu-card-icon{transform:scale(1.08);background:var(--forest-deep);color:#fff;}
+  .megamenu-card-icon{transition:transform .5s cubic-bezier(.22,1,.36,1), background-color var(--dur-s) var(--ease), color var(--dur-s) var(--ease);}
+
+  /* partner logos: colour + lift */
+  .plogo:hover{transform:translateY(-3px);}
+  .plogo{transition:opacity var(--dur-s) var(--ease), filter var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);}
+
+  /* footer: link bar items, social icons, store badges */
+  .flink svg{transition:transform .4s cubic-bezier(.22,1,.36,1);}
+  .flink:hover svg{transform:translateY(-2px) scale(1.15);}
+  .socials a{transition:opacity var(--dur-s) var(--ease), transform .4s cubic-bezier(.22,1,.36,1);}
+  .socials a:hover{transform:translateY(-4px) scale(1.15);}
+  .fcol ul a{position:relative;}
+  .nl-form input:focus{box-shadow:0 0 0 4px rgba(200,143,39,.25);}
+  .store-row a, .fstores a{transition:transform var(--dur-s) var(--ease), filter var(--dur-s) var(--ease);}
+  .store-row a:hover{transform:translateY(-3px);filter:drop-shadow(0 10px 14px rgba(0,0,0,.3));}
+
+  @media (prefers-reduced-motion: reduce){
+    .btn::after, .btn-primary::after, .stat-card::before, .primary-nav > a::after, .primary-nav .menu::after, .carousel-eyebrow::after{display:none;}
+    .btn:hover, .fx-item:hover .fx-item__icon, .fx-item:hover .fx-value, .about-feature:hover, .about-feature:hover .about-feature__icon,
+    .stat-card:hover, .stat-card:hover .stat-card__icon, .stats-photo:hover img, .carousel-slide:hover .carousel-slide-body, .carousel-arrow:hover,
+    .megamenu-card:hover, .megamenu-card:hover .megamenu-card-icon, .plogo:hover, .flink:hover svg, .socials a:hover, .store-row a:hover{transform:none;}
+  }
+
+  /* ---------- MEGAMENU: premium polish ---------- */
+  .megamenu{background:rgba(255,255,255,.88);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);
+    border-top:none;box-shadow:0 30px 60px -28px rgba(5,42,37,.35);}
+  .megamenu::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--brand-gold) 20%,var(--forest) 80%,transparent);}
+  .megamenu:not([hidden]){animation:menuIn .5s var(--ease) backwards;}
+  @keyframes menuIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:none;}}
+  .megamenu:not([hidden]) .megamenu-col, .megamenu:not([hidden]) .megamenu-card{animation:menuItemIn .7s var(--ease) backwards;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(1){animation-delay:.05s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(2){animation-delay:.10s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(3){animation-delay:.15s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(4){animation-delay:.20s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(5){animation-delay:.25s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(6){animation-delay:.30s;}
+  @keyframes menuItemIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+  /* column heads: gold rule draws under the heading on hover */
+  .megamenu-col-head{position:relative;}
+  .megamenu-col-head::after{content:"";position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--brand-gold);transition:width .5s var(--ease);}
+  .megamenu-col:hover .megamenu-col-head::after{width:100%;}
+  /* links: gold dot slides in, text nudges */
+  .megamenu-col-list a{position:relative;transition:color var(--dur-xs) var(--ease), background-color var(--dur-xs) var(--ease), padding-left var(--dur-s) var(--ease);}
+  .megamenu-col-list a::before{content:"";position:absolute;left:4px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;
+    background:var(--brand-gold);opacity:0;transform:scale(.4);transition:opacity var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);}
+  .megamenu-col-list a:hover{padding-left:20px;}
+  .megamenu-col-list a:hover::before{opacity:1;transform:scale(1);}
+  /* cards: hairline border + soft lift */
+  .megamenu-card{border:1px solid transparent;padding:10px 12px;}
+  .megamenu-card:hover{border-color:var(--border-soft);background:#fff;box-shadow:0 14px 26px -20px rgba(5,42,37,.45);}
+  @media (prefers-reduced-motion: reduce){
+    .megamenu:not([hidden]), .megamenu:not([hidden]) .megamenu-col, .megamenu:not([hidden]) .megamenu-card{animation:none;}
+    .megamenu-col-head::after, .megamenu-col-list a::before{display:none;}
+    .megamenu-col-list a:hover{padding-left:4px;}
+  }
+
+  /* ---------- STATS: premium motion ---------- */
+  /* icons draw themselves in as the tile appears */
+  .has-js .stat-card__icon svg *{stroke-dasharray:1;stroke-dashoffset:1;opacity:0;}
+  .has-js .stat-card.in-view .stat-card__icon svg *, .has-js .stat-card:not([data-reveal-once]) .stat-card__icon svg *{
+    animation:iconDraw 1.3s var(--ease) calc(var(--reveal-delay,0ms) + .25s) forwards;}
+  @keyframes iconDraw{from{opacity:1;stroke-dashoffset:1;}to{opacity:1;stroke-dashoffset:0;}}
+  /* numbers: soft gold sheen sweeps across once when the tile appears */
+  .stat-card__num{background:linear-gradient(100deg,#fff 40%,#f6d58a 50%,#fff 60%);background-size:250% 100%;background-position:120% 0;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
+  .has-js .stat-card.in-view .stat-card__num{animation:numSheen 1.6s var(--ease) calc(var(--reveal-delay,0ms) + .5s) 1 forwards;}
+  @keyframes numSheen{from{background-position:120% 0;}to{background-position:-20% 0;}}
+  /* photos: wipe up from a slightly zoomed frame, then settle */
+  .has-js .stats-photo img{transition:transform 1.4s var(--ease), clip-path 1.1s var(--ease);}
+  .has-js .stats-photo:not(.in-view) img{clip-path:inset(100% 0 0 0);transform:scale(1.18);}
+  .has-js .stats-photo.in-view img{clip-path:inset(0 0 0 0);}
+  @media (prefers-reduced-motion: reduce){
+    .has-js .stat-card__icon svg *{stroke-dasharray:none;stroke-dashoffset:0;opacity:1;animation:none!important;}
+    .has-js .stat-card.in-view .stat-card__num{animation:none;}
+    .has-js .stats-photo:not(.in-view) img{clip-path:none;transform:none;}
+  }
+
+  /* stats: idle drifting glow + 3D pointer tilt */
+  .stat-card:hover{transform:perspective(900px) translateY(-6px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));}
+  @media (prefers-reduced-motion: reduce){ .stat-card:hover{transform:none;} }
+
+  /* ---------- EXCHANGE RATES: one white bar hanging over the hero ---------- */
+  .fx-section{padding:0;margin-top:-46px;position:relative;z-index:6;}
+  .fx-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#fff;border:1px solid var(--border-soft);
+    border-radius:var(--radius-card);box-shadow:0 24px 44px -26px rgba(5,42,37,.45);overflow:hidden;}
+  .fx-item{display:flex;align-items:center;justify-content:flex-start;gap:14px;border:none;border-radius:0;background:transparent;
+    padding:20px 28px;transition:background-color var(--dur-s) var(--ease);}
+  .fx-item:hover{transform:none;background:#f6f9f6;}
+  .fx-item + .fx-item{border-left:1px solid var(--border-soft);}
+  .fx-item__body{min-width:0;}
+  .fx-item__head{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+  .fx-item__code{display:inline;font-size:16px;font-weight:800;color:var(--ink);}
+  .fx-item__name{display:inline;font-size:13px;color:var(--muted);}
+  .fx-rates{display:flex;gap:18px;background:none;}
+  .fx-rates > span{display:flex;align-items:baseline;gap:6px;padding:0;border:none;margin:0;}
+  .fx-rates em{font-style:normal;font-size:13px;color:var(--muted);}
+  .fx-rates b{font-size:18px;font-weight:800;letter-spacing:-.4px;color:var(--forest);}
+  .fx-item:hover .fx-item__icon{transform:rotate(360deg) scale(1.06);background:var(--brand-gold);color:var(--ink);}
+  @media (max-width:760px){
+    .fx-section{margin-top:-30px;}
+    .fx-row{grid-template-columns:1fr;}
+    .fx-item + .fx-item{border-left:none;border-top:1px solid var(--border-soft);}
+    .fx-item{padding:16px 20px;}
+  }
+
+  .read-more{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:14.5px;font-weight:700;color:var(--forest);
+    position:relative;transition:color var(--dur-s) var(--ease);}
+  .read-more::after{content:"";position:absolute;left:0;right:22px;bottom:-3px;height:2px;background:var(--brand-gold);
+    transform:scaleX(0);transform-origin:left;transition:transform var(--dur-s) var(--ease);}
+  .read-more svg{width:15px;height:15px;transition:transform var(--dur-s) var(--ease);}
+  .read-more:hover::after{transform:scaleX(1);}
+  .read-more:hover svg{transform:translateX(4px);}
+  @media (prefers-reduced-motion: reduce){ .read-more::after, .read-more svg{transition:none;} .read-more:hover svg{transform:none;} }
+
+  /* one size for every section title (matches the "Your Finances" reference) */
+  :root{--title-size:46px;}
+  .section-head h2, .stats-head h2, .app-promo-copy h2{font-size:var(--title-size);line-height:1.2;letter-spacing:-.5px;}
+  .section-head h2{max-width:680px;}
+  .stats-head{max-width:900px;}
+  .app-promo-copy h2{max-width:560px;}
+  @media (max-width:900px){ :root{--title-size:36px;} }
+  @media (max-width:560px){ :root{--title-size:30px;} }
+
+  /* ---------- MENU MOTION (modelled on securevest's nav) ----------
+     top-level items: 1px underline wipes in from the left and out to the
+     right (300ms); mega-menu items slide in from alternating sides
+     (odd from the left, even from the right, 32px, fade) in a stagger. */
+  .primary-nav > a::after, .primary-nav .menu::after{height:1px;bottom:8px;border-radius:2px;transform-origin:right center;
+    transition:transform .45s var(--ease);}
+  .primary-nav > a:hover::after, .primary-nav .menu:hover::after, .primary-nav .menu[aria-expanded="true"]::after{transform-origin:left center;}
+  .primary-nav .menu .chev{transition:transform .45s var(--ease);}
+  .primary-nav .menu[aria-expanded="true"] .chev{transform:rotate(180deg);}
+  .megamenu-col:nth-child(odd), .megamenu-card:nth-child(odd){--sx:-32px;}
+  .megamenu-col:nth-child(even), .megamenu-card:nth-child(even){--sx:32px;}
+  @keyframes menuItemIn{from{opacity:0;transform:translateX(var(--sx,0));}to{opacity:1;transform:none;}}
+  .megamenu:not([hidden]) .megamenu-col, .megamenu:not([hidden]) .megamenu-card{animation:menuItemIn .65s var(--ease) backwards;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(1){animation-delay:.08s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(2){animation-delay:.16s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(3){animation-delay:.24s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(4){animation-delay:.32s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(5){animation-delay:.40s;}
+  .megamenu:not([hidden]) :is(.megamenu-col,.megamenu-card):nth-child(6){animation-delay:.48s;}
+  @media (prefers-reduced-motion: reduce){
+    .megamenu:not([hidden]) .megamenu-col, .megamenu:not([hidden]) .megamenu-card{animation:none;}
+    .primary-nav > a::after, .primary-nav .menu::after, .primary-nav .menu .chev{transition:none;}
+  }
+
+  /* Login: plain text trigger (no button) with a two-item dropdown */
+  .nav-right .dropdown{left:auto;right:0;}
+  .login-trigger{font-weight:600;color:var(--ink);}
+  .login-trigger:hover{color:var(--forest);}
+  .nav:not(.scrolled) .login-trigger:hover{color:var(--brand-gold);}
+  .nav-right .dropdown a svg{width:16px;height:16px;flex-shrink:0;margin-right:10px;color:var(--text-secondary);}
+  .nav-right .dropdown a{display:flex;align-items:center;}
+
+  /* language + login: same underline wipe, chevron turn and staggered dropdown items as the main menu */
+  .lang{position:relative;}
+  .lang::after{content:"";position:absolute;left:10px;right:10px;bottom:6px;height:1px;border-radius:2px;background:var(--brand-gold);
+    transform:scaleX(0);transform-origin:right center;transition:transform .45s var(--ease);}
+  .lang:hover::after, .lang[aria-expanded="true"]::after{transform:scaleX(1);transform-origin:left center;}
+  .lang .chev{transition:transform .45s var(--ease);}
+  .lang[aria-expanded="true"] .chev{transform:rotate(180deg);}
+  .nav-right .dropdown:not(.megamenu):not([hidden]){animation:menuFlip .4s cubic-bezier(.61,.02,.29,.99) backwards;}
+  .nav-right .dropdown:not(.megamenu):not([hidden]) a{animation:menuItemIn .6s var(--ease) backwards;}
+  .nav-right .dropdown:not(.megamenu):not([hidden]) a:nth-child(odd){--sx:-24px;animation-delay:.06s;}
+  .nav-right .dropdown:not(.megamenu):not([hidden]) a:nth-child(even){--sx:24px;animation-delay:.14s;}
+  .nav-right .dropdown:not(.megamenu):not([hidden]) a:nth-child(n+3){animation-delay:.22s;}
+  @media (prefers-reduced-motion: reduce){
+    .lang::after, .lang .chev{transition:none;}
+    .nav-right .dropdown:not(.megamenu):not([hidden]), .nav-right .dropdown:not(.megamenu):not([hidden]) a{animation:none;}
+  }
+
+  /* wide screens: fixed 72px side gutters, content fills the rest */
+  @media (min-width:1333px){
+    .wrap{max-width:none;padding-left:72px;padding-right:72px;}
+    .nav-inner, .hero-inner{max-width:none;padding-left:72px;padding-right:72px;}
+    .newsletter, .footer-main{max-width:none;padding-left:72px;padding-right:72px;}
+    .footer-links-bar{max-width:none;margin-left:72px;margin-right:72px;}
+    .megamenu-wrap{padding-left:72px;padding-right:72px;}
+  }
+
+  /* ---------- MENU: securevest-style open ----------
+     Panel flips down from its top edge: perspective(600px) rotateX(-90deg) -> 0,
+     opacity 0 -> 1, 0.4s cubic-bezier(.61,.02,.29,.99), origin centre-top.
+     Top-level items lift 5px; the underline grows from BOTH ends to meet in the
+     middle; chevron turns. */
+  .megamenu, .dropdown:not([hidden]){transform-origin:center top;backface-visibility:hidden;}
+  .megamenu:not([hidden]), .dropdown:not([hidden]){animation:menuFlip .4s cubic-bezier(.61,.02,.29,.99) backwards;}
+  @keyframes menuFlip{from{opacity:0;transform:perspective(600px) rotateX(-90deg);}to{opacity:1;transform:perspective(600px) rotateX(0deg);}}
+  .primary-nav > a, .primary-nav .menu{transition:transform .3s var(--ease), color .3s var(--ease), background-color .3s var(--ease);}
+  .primary-nav > a:hover, .primary-nav .menu:hover, .primary-nav .menu[aria-expanded="true"]{transform:translateY(-5px);}
+  .primary-nav > a::after, .primary-nav .menu::after{left:12px;right:50%;transform-origin:left center;}
+  .primary-nav > a::before, .primary-nav .menu::before{content:"";position:absolute;left:50%;right:12px;bottom:8px;height:1px;border-radius:2px;
+    background:var(--brand-gold);transform:scaleX(0);transform-origin:right center;transition:transform .3s ease-in-out;}
+  .primary-nav > a:hover::before, .primary-nav .menu:hover::before, .primary-nav .menu[aria-expanded="true"]::before,
+  .primary-nav > a:hover::after, .primary-nav .menu:hover::after, .primary-nav .menu[aria-expanded="true"]::after{transform:scaleX(1);}
+  @media (prefers-reduced-motion: reduce){
+    .megamenu:not([hidden]), .dropdown:not([hidden]){animation:none;}
+    .primary-nav > a:hover, .primary-nav .menu:hover, .primary-nav .menu[aria-expanded="true"]{transform:none;}
+    .primary-nav > a::before, .primary-nav .menu::before{transition:none;}
+  }
+
+  /* ---------- TEXT MOTION: subtle rise-and-fade for copy inside revealed blocks ---------- */
+  .has-js [data-reveal] :is(h2, h3, p, .read-more, .fx-item__body){
+    opacity:0;transform:translateY(14px);
+    transition:opacity .9s var(--ease), transform .9s var(--ease);}
+  .has-js [data-reveal].in-view :is(h2, h3, p, .read-more, .fx-item__body){opacity:1;transform:none;}
+  .has-js [data-reveal].in-view :is(h2, h3){transition-delay:.12s;}
+  .has-js [data-reveal].in-view :is(p){transition-delay:.24s;}
+  .has-js [data-reveal].in-view :is(.read-more){transition-delay:.36s;}
+  /* keep hero-like carousel copy and menus out of this */
+  .has-js .carousel-slide :is(h3, p){opacity:1;transform:none;}
+  .has-js .megamenu :is(h3, p){opacity:1;transform:none;}
+
+  /* hover: headings/labels warm to deep green, footer + list links get a drawn underline */
+  .about-feature h3, .qa-card__title, .stat-card__lbl{transition:color var(--dur-m) var(--ease), transform var(--dur-m) var(--ease);}
+  .about-feature:hover h3{color:var(--forest);transform:translateX(3px);}
+  .fcol ul a, .megamenu-col-list a{background-image:linear-gradient(var(--brand-gold),var(--brand-gold));background-repeat:no-repeat;
+    background-position:0 100%;background-size:0 1px;
+    transition:color var(--dur-s) var(--ease), background-size .5s var(--ease), transform var(--dur-s) var(--ease);}
+  .fcol ul a:hover{background-size:100% 1px;}
+  .section-head p, .stats-head p, .app-promo-copy p{transition:color var(--dur-m) var(--ease);}
+  @media (prefers-reduced-motion: reduce){
+    .has-js [data-reveal] :is(h2, h3, p, .read-more, .fx-item__body){opacity:1!important;transform:none!important;transition:none!important;}
+    .fcol ul a{background-image:none;}
+    .about-feature:hover h3{transform:none;}
+  }
 </style>
 <script>
   /* Runs before first paint so [data-reveal] only hides content when JS is
@@ -691,9 +1210,9 @@
 <!-- NAV -->
 <nav class="nav" aria-label="Primary">
  <div class="nav-inner">
-  <div style="display:flex;align-items:center;gap:36px;flex-wrap:wrap;">
     <a class="brand" href="#" aria-label="Ghazanfar Bank home">
-      <img src="img/logo.png" alt="Ghazanfar Bank">
+      <img class="brand-logo brand-logo--dark" src="img/logo.png" alt="Ghazanfar Bank">
+      <img class="brand-logo brand-logo--light" src="img/footer-logo.svg" alt="" aria-hidden="true">
     </a>
     <div class="primary-nav">
       <a href="#">Home</a>
@@ -802,7 +1321,6 @@
         </div>
       </div>
     </div>
-  </div>
   <div class="nav-right">
     <div class="nav-item">
       <button class="lang" type="button" aria-haspopup="true" aria-expanded="false">
@@ -817,10 +1335,18 @@
         <a href="#">Oʻzbekcha (Uzbek)</a>
       </div>
     </div>
-    <a class="acct" href="#">
-      <i data-lucide="user" width="16" height="16"></i>
-      Login
-    </a>
+    <div class="nav-item">
+      <button class="lang login-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+        <i data-lucide="log-in"></i>
+        Login
+        <i data-lucide="chevron-down" class="chev"></i>
+      </button>
+      <div class="dropdown" hidden>
+        <a href="#"><i data-lucide="log-in"></i> Online Banking</a>
+        <a href="#"><i data-lucide="log-in"></i> Credit &amp; Prepaid Card</a>
+      </div>
+    </div>
+    <a class="btn btn--gold nav-open-acct" href="#">Open Bank Account</a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
       <i data-lucide="menu" class="icon-open"></i>
       <i data-lucide="x" class="icon-close"></i>
@@ -852,8 +1378,10 @@
   </div>
   <div class="m-lang-login">
     <a class="acct" href="#">EN</a>
-    <a class="acct" href="#">Login</a>
   </div>
+  <a href="#"><i data-lucide="log-in"></i> Login — Online Banking</a>
+  <a href="#"><i data-lucide="log-in"></i> Login — Credit &amp; Prepaid Card</a>
+  <a class="btn btn--gold" style="margin-top:10px;" href="#">Open Bank Account</a>
 </div>
 
 <main id="main">
@@ -872,53 +1400,37 @@
         <a href="#" aria-label="Download on the App Store"><img class="store-badge" src="img/Group-5.svg" alt=""></a>
       </div>
     </div>
-    <div class="phones">
-      <div class="phone p1"><div class="screen"><div class="ring"></div></div></div>
-      <div class="phone p2"><div class="screen">
-        <img src="img/logo.png" alt="Ghazanfar Bank">
-      </div></div>
-      <div class="phone p3"><div class="screen"></div></div>
+    <div class="hero-card-visual" id="heroCards" aria-label="Ghazanfar Bank debit cards" role="img">
+      <div class="hero-card hero-card--back" data-card="back"><div class="hero-card__float"><picture><source srcset="img/card-back.webp" type="image/webp"><img src="img/card-back.png" width="1448" height="1086" alt="" decoding="async"></picture></div></div>
+      <div class="hero-card hero-card--green" data-card="green"><div class="hero-card__float"><picture><source srcset="img/card-front-green.webp" type="image/webp"><img src="img/card-front-green.png" width="1448" height="1086" alt="" decoding="async"></picture></div></div>
+      <div class="hero-card hero-card--black" data-card="black"><div class="hero-card__float"><picture><source srcset="img/card-front-black.webp" type="image/webp"><img src="img/card-front-black.png" width="1448" height="1086" alt="" fetchpriority="high" decoding="async"></picture></div></div>
     </div>
   </div>
 </section>
 
 <!-- FOREIGN EXCHANGE -->
-<section class="fx-section" aria-label="Foreign exchange rates">
+<section class="fx-section" aria-label="Buy and sell rates for today">
   <div class="wrap">
-    <div class="fx-card" data-reveal>
-      <div class="fx-head">
-        <div class="fx-eyebrow">Foreign Exchange Rates</div>
+    <div class="fx-row" data-reveal style="--reveal-delay:80ms;">
+      <div class="fx-item">
+        <span class="fx-item__icon" aria-hidden="true">$</span>
+        <div class="fx-item__body">
+          <div class="fx-item__head"><span class="fx-item__code">USD</span><span class="fx-item__name">US Dollar</span></div>
+          <div class="fx-rates"><span><em>Buy</em><b>50.00</b></span><span><em>Sell</em><b>50.50</b></span></div>
+        </div>
       </div>
-      <div class="fx-row">
-        <div class="fx-item">
-          <div class="fx-cur">
-            <span class="fx-icon" aria-hidden="true">$</span>
-            <span class="fx-name"><b>USD</b><small>US Dollar</small></span>
-          </div>
-          <div class="fx-rates">
-            <div><span class="fx-label">Buy</span><span class="fx-value">50.00</span></div>
-            <div><span class="fx-label">Sell</span><span class="fx-value">50.50</span></div>
-          </div>
+      <div class="fx-item">
+        <span class="fx-item__icon" aria-hidden="true">€</span>
+        <div class="fx-item__body">
+          <div class="fx-item__head"><span class="fx-item__code">EUR</span><span class="fx-item__name">Euro</span></div>
+          <div class="fx-rates"><span><em>Buy</em><b>76.80</b></span><span><em>Sell</em><b>78.10</b></span></div>
         </div>
-        <div class="fx-item">
-          <div class="fx-cur">
-            <span class="fx-icon" aria-hidden="true">€</span>
-            <span class="fx-name"><b>EUR</b><small>Euro</small></span>
-          </div>
-          <div class="fx-rates">
-            <div><span class="fx-label">Buy</span><span class="fx-value">76.80</span></div>
-            <div><span class="fx-label">Sell</span><span class="fx-value">78.10</span></div>
-          </div>
-        </div>
-        <div class="fx-item">
-          <div class="fx-cur">
-            <span class="fx-icon" aria-hidden="true">£</span>
-            <span class="fx-name"><b>GBP</b><small>British Pound</small></span>
-          </div>
-          <div class="fx-rates">
-            <div><span class="fx-label">Buy</span><span class="fx-value">89.50</span></div>
-            <div><span class="fx-label">Sell</span><span class="fx-value">91.00</span></div>
-          </div>
+      </div>
+      <div class="fx-item">
+        <span class="fx-item__icon" aria-hidden="true">£</span>
+        <div class="fx-item__body">
+          <div class="fx-item__head"><span class="fx-item__code">GBP</span><span class="fx-item__name">British Pound</span></div>
+          <div class="fx-rates"><span><em>Buy</em><b>89.50</b></span><span><em>Sell</em><b>91.00</b></span></div>
         </div>
       </div>
     </div>
@@ -928,176 +1440,251 @@
 <!-- PRODUCTS -->
 <section class="products-section">
   <div class="wrap">
-    <div class="section-head" data-reveal>
-      <h2>Your Finances, Guided by Islamic Principles</h2>
-      <p>With a robust suite of products ranging from digital banking and payment processing to wealth.</p>
+    <div class="section-head about-head" data-reveal>
+      <div class="about-head__left">
+        <h2>Your Finances, Guided by Islamic Principles</h2>
+      </div>
+      <p>With a robust suite of products ranging from digital banking and payment processing to wealth management — all built on transparent, Shariah-compliant foundations.</p>
     </div>
-    <div class="cards-scroll">
-      <div class="pcard c1" data-reveal style="--reveal-delay:0ms;">
-        <div class="pcard__media" style="background-image:url('img/Peronal%20Banking.png');background-size:cover;background-position:center;"></div>
-        <div class="pcard__scrim"></div>
-        <div class="pcard__content">
-          <span class="pcard__eyebrow">Personal Banking</span>
-          <h3>Personal Islamic Banking</h3>
-          <p>Al-Wadiah current accounts, Mudarabah savings, and Halal financing.</p>
-        </div>
+
+    <div class="about-features" data-reveal style="--reveal-delay:80ms;">
+      <div class="about-feature">
+        <span class="about-feature__icon"><i data-lucide="user" stroke-width="2"></i></span>
+        <h3>Personal Islamic Banking</h3>
+        <p>Al-Wadiah current accounts, Mudarabah savings, and Halal financing.</p>
+        <a class="read-more" href="#" aria-label="Read more about Personal Islamic Banking">Read more <i data-lucide="arrow-right"></i></a>
       </div>
-      <div class="pcard c2" data-reveal style="--reveal-delay:90ms;">
-        <div class="pcard__media" style="background-image:url('img/Islamic%20Banking.png');background-size:cover;background-position:center;"></div>
-        <div class="pcard__scrim"></div>
-        <div class="pcard__content">
-          <span class="pcard__eyebrow">Corporate Banking</span>
-          <h3>Islamic Corporate Banking</h3>
-          <p>Grow your business with Murabaha trade financing, and more.</p>
-        </div>
+      <div class="about-feature">
+        <span class="about-feature__icon"><i data-lucide="building-2" stroke-width="2"></i></span>
+        <h3>Islamic Corporate Banking</h3>
+        <p>Grow your business with Murabaha trade financing, and more.</p>
+        <a class="read-more" href="#" aria-label="Read more about Islamic Corporate Banking">Read more <i data-lucide="arrow-right"></i></a>
       </div>
-      <div class="pcard c3" data-reveal style="--reveal-delay:180ms;">
-        <div class="pcard__media" style="background-image:url('img/Digital%20Banking.png');background-size:cover;background-position:center;"></div>
-        <div class="pcard__scrim"></div>
-        <div class="pcard__content">
-          <span class="pcard__eyebrow">Digital Banking</span>
-          <h3>Digital Banking</h3>
-          <p>Profit-sharing deposits, Shariah-compliant financing, and ethical tools.</p>
-        </div>
+      <div class="about-feature">
+        <span class="about-feature__icon"><i data-lucide="smartphone" stroke-width="2"></i></span>
+        <h3>Digital Banking</h3>
+        <p>Profit-sharing deposits, Shariah-compliant financing, and ethical tools.</p>
+        <a class="read-more" href="#" aria-label="Read more about Digital Banking">Read more <i data-lucide="arrow-right"></i></a>
       </div>
     </div>
+
     <a class="btn-primary" href="#">Explore All Shariah-Compliant Services
       <i data-lucide="arrow-right" width="15" height="15" stroke="#fff"></i>
     </a>
   </div>
+
+  <div class="about-img" data-reveal style="--reveal-delay:160ms;">
+    <video src="img/Banner1.mp4" poster="img/section-img_b1475276b6744ccd8c2530005870944b.avif" autoplay muted loop playsinline preload="metadata" aria-label="Ghazanfar Bank Islamic Banking branch"></video>
+  </div>
 </section>
 
-<!-- FEATURES / TABS -->
-<section class="features-section">
+
+<!-- QUICK ACCESS (original — hidden; ask to restore this version if needed) -->
+<section class="quick" id="quickOriginal" hidden>
   <div class="wrap">
-    <div class="features-panel" id="featuresPanel" data-reveal style="--reveal-delay:100ms;">
-      <div class="features-panel__bg" aria-hidden="true"></div>
-      <div class="section-head" data-reveal>
-        <h2>Leveraging Technology for Secure, Shariah-Compliant Banking</h2>
-        <p>By combining modern technology with Islamic financial principles, we deliver a comprehensive suite of Shariah-compliant services — empowering individuals and businesses across Afghanistan.</p>
-      </div>
-      <div class="tabs" role="tablist" aria-label="Banking features">
-        <button class="tab active" type="button" role="tab" id="tab-cards" aria-controls="panel-cards" aria-selected="true" data-tab="cards">Shariah-Compliant Debit Cards</button>
-        <button class="tab" type="button" role="tab" id="tab-internet" aria-controls="panel-internet" aria-selected="false" tabindex="-1" data-tab="internet">Islamic Internet Banking</button>
-        <button class="tab" type="button" role="tab" id="tab-locker" aria-controls="panel-locker" aria-selected="false" tabindex="-1" data-tab="locker">Safe Deposit Locker</button>
-      </div>
-
-      <div class="tab-body panel-in" id="panel-cards" role="tabpanel" aria-labelledby="tab-cards" data-panel="cards">
-        <div>
-          <h3>Global Access With Shariah-Compliant Master Debit Cards</h3>
-          <div class="check-list">
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Contactless, Shariah-compliant payment technology</div>
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Access 100+ Nationwide &amp; 1,000+ International ATMs</div>
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Minimum annual fees · Zero Riba · Full Shariah compliance</div>
+    <div class="quick-card" data-reveal>
+      <div class="quick-card__grid">
+        <div class="quick-card__head">
+          <h2>Quick Access to Our Essential Islamic Banking Services</h2>
+          <p>Access all our Shariah-compliant banking services through our secure digital platform — fast, transparent, and designed around your needs.</p>
+        </div>
+        <div class="qa-list">
+          <div class="qa-item active" data-qa="login">
+            <button class="qa-row" type="button" aria-expanded="true">
+              <span class="qa-row-icon"><i data-lucide="log-in"></i></span>
+              <span class="qa-row-title">Online Banking Login</span>
+              <span class="qa-row-toggle"><i data-lucide="plus" class="icon-plus"></i><i data-lucide="minus" class="icon-minus"></i></span>
+            </button>
+            <div class="qa-content">
+              <div class="qa-content-body">
+                <p>Access your Shariah-compliant accounts securely from anywhere — anytime, on any device.</p>
+                <a class="btn-primary" href="#">Login Now
+                  <i data-lucide="arrow-right" width="15" height="15"></i>
+                </a>
+              </div>
+            </div>
           </div>
-          <a class="btn-outline" href="#">Apply for Your Shariah-Compliant Debit Card
-            <i data-lucide="arrow-right" width="14" height="14"></i>
-          </a>
-        </div>
-        <div class="card-visual" style="background-image:url('img/Shariah-Compliant%20EMV%20Debit%20Cards.png');background-size:cover;background-position:center;">
-          <div class="card-visual__scrim" aria-hidden="true"></div>
-          <p class="card-visual__desc">Enjoy worldwide acceptance with our chip-enabled, Shariah-compliant master debit cards. Shop online, pay at merchants, and withdraw cash from ATMs across Afghanistan &amp; Overseas — with zero Riba and zero hidden fees.</p>
-        </div>
-      </div>
-
-      <div class="tab-body" id="panel-internet" role="tabpanel" aria-labelledby="tab-internet" data-panel="internet" style="display:none;">
-        <div>
-          <h3>Bank Securely From Anywhere With Islamic Internet Banking</h3>
-          <div class="check-list">
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Real-time balance &amp; transaction tracking</div>
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Free transfers between Ghazanfar Bank accounts</div>
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Bank-grade encryption &amp; two-factor authentication</div>
+          <div class="qa-item" data-qa="wu">
+            <button class="qa-row" type="button" aria-expanded="false">
+              <span class="qa-row-icon"><i data-lucide="send"></i></span>
+              <span class="qa-row-title">Western Union</span>
+              <span class="qa-row-toggle"><i data-lucide="plus" class="icon-plus"></i><i data-lucide="minus" class="icon-minus"></i></span>
+            </button>
+            <div class="qa-content">
+              <div class="qa-content-body">
+                <p>Send and receive international money transfers through our Shariah-compliant partner network.</p>
+                <a class="btn-primary" href="#">Send Money
+                  <i data-lucide="arrow-right" width="15" height="15"></i>
+                </a>
+              </div>
+            </div>
           </div>
-          <a class="btn-outline" href="#">Log In to Internet Banking
-            <i data-lucide="arrow-right" width="14" height="14"></i>
-          </a>
-        </div>
-        <div class="card-visual" style="background-image:url('img/Islamic%20Internet%20Banking.png');background-size:cover;background-position:center;">
-          <div class="card-visual__scrim" aria-hidden="true"></div>
-          <p class="card-visual__desc">Manage your accounts, transfer funds, and pay bills online — all fully Shariah-compliant, encrypted, and available 24/7 from any device.</p>
-        </div>
-      </div>
-
-      <div class="tab-body" id="panel-locker" role="tabpanel" aria-labelledby="tab-locker" data-panel="locker" style="display:none;">
-        <div>
-          <h3>Keep Valuables Safe With Shariah-Compliant Deposit Lockers</h3>
-          <div class="check-list">
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Dual-key access with 24/7 branch security</div>
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Multiple locker sizes to fit your needs</div>
-            <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Transparent, Shariah-compliant rental terms</div>
+          <div class="qa-item" data-qa="bg">
+            <button class="qa-row" type="button" aria-expanded="false">
+              <span class="qa-row-icon"><i data-lucide="shield-check"></i></span>
+              <span class="qa-row-title">Bank Guarantee</span>
+              <span class="qa-row-toggle"><i data-lucide="plus" class="icon-plus"></i><i data-lucide="minus" class="icon-minus"></i></span>
+            </button>
+            <div class="qa-content">
+              <div class="qa-content-body">
+                <p>Secure trade and contract guarantees, structured to remain fully Shariah-compliant.</p>
+                <a class="btn-primary" href="#">Request a Guarantee
+                  <i data-lucide="arrow-right" width="15" height="15"></i>
+                </a>
+              </div>
+            </div>
           </div>
-          <a class="btn-outline" href="#">Reserve a Locker
-            <i data-lucide="arrow-right" width="14" height="14"></i>
-          </a>
-        </div>
-        <div class="card-visual" style="background-image:url('img/Safe%20Deposit%20Locker.png');background-size:cover;background-position:center;">
-          <div class="card-visual__scrim" aria-hidden="true"></div>
-          <p class="card-visual__desc">Store important documents, jewelry, and valuables in our secure, branch-based safe deposit lockers — available to all account holders on flexible, ethical terms.</p>
+          <div class="qa-item" data-qa="atm">
+            <button class="qa-row" type="button" aria-expanded="false">
+              <span class="qa-row-icon"><i data-lucide="credit-card"></i></span>
+              <span class="qa-row-title">ATM Debit Cards</span>
+              <span class="qa-row-toggle"><i data-lucide="plus" class="icon-plus"></i><i data-lucide="minus" class="icon-minus"></i></span>
+            </button>
+            <div class="qa-content">
+              <div class="qa-content-body">
+                <p>Order or manage your Shariah-compliant ATM debit card in a few taps.</p>
+                <a class="btn-primary" href="#">Manage Cards
+                  <i data-lucide="arrow-right" width="15" height="15"></i>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- QUICK ACCESS -->
-<section class="quick">
+<!-- QUICK ACCESS (duplicate — currently visible/active copy) -->
+<section class="quick" id="quickDuplicate">
   <div class="wrap">
-    <div class="section-head on-color" data-reveal>
-      <h2>Quick Access to Our Essential Islamic Banking Services</h2>
+    <div class="section-head quick-head" data-reveal>
+      <div class="quick-head__left">
+        <h2>Quick Access to Our Essential Islamic Banking Services</h2>
+      </div>
       <p>Access all our Shariah-compliant banking services through our secure digital platform — fast, transparent, and designed around your needs.</p>
     </div>
-    <div class="qa-layout" data-reveal style="--reveal-delay:100ms;">
-      <div class="qa-list" id="qaList">
-        <button class="qa-row" type="button" data-qa="login">Islamic Online Banking Login
-          <i data-lucide="arrow-right"></i>
-        </button>
-        <button class="qa-row" type="button" data-qa="wu">Western Union
-          <i data-lucide="arrow-right"></i>
-        </button>
-        <button class="qa-row" type="button" data-qa="bg">Bank Guarantee
-          <i data-lucide="arrow-right"></i>
-        </button>
-        <button class="qa-row active" type="button" data-qa="atm">ATM Debit Cards
-          <i data-lucide="arrow-right"></i>
-        </button>
+    <div class="qa-grid" data-reveal style="--reveal-delay:80ms;">
+      <div class="qa-card">
+        <div class="qa-card__top">
+          <img class="qa-card__img" src="img/tab1.png" alt="Online banking login on a phone" loading="lazy">
+          <span class="qa-card__ghost">01</span>
+        </div>
+        <h3 class="qa-card__title">Online Banking Login</h3>
+        <div class="qa-card__divider"></div>
+        <p>Access your Shariah-compliant accounts securely from anywhere — anytime, on any device.</p>
+        <a class="qa-card__cta" href="#">Login Now <i data-lucide="arrow-right"></i></a>
       </div>
-      <div class="qa-visual">
-        <img id="qaVisualImg" src="img/ATM%20Debit%20Card.png" alt="">
-        <div class="qa-visual-scrim" aria-hidden="true"></div>
-        <div class="qa-panels">
-      <div class="qa-panel" data-qa="login">
-        <div class="qa-panel-foot">
-          <p>Access your Shariah-compliant accounts securely from anywhere — anytime, on any device.</p>
-          <a class="btn-primary" href="#">Login Now
-            <i data-lucide="arrow-right" width="15" height="15" stroke="#fff"></i>
-          </a>
+      <div class="qa-card">
+        <div class="qa-card__top">
+          <img class="qa-card__img" src="img/tab2.png" alt="Western Union money transfer" loading="lazy">
+          <span class="qa-card__ghost">02</span>
+        </div>
+        <h3 class="qa-card__title">Western Union</h3>
+        <div class="qa-card__divider"></div>
+        <p>Send and receive international money transfers through our Shariah-compliant partner network.</p>
+        <a class="qa-card__cta" href="#">Send Money <i data-lucide="arrow-right"></i></a>
+      </div>
+      <div class="qa-card">
+        <div class="qa-card__top">
+          <img class="qa-card__img" src="img/tab3.png" alt="Bank guarantee" loading="lazy">
+          <span class="qa-card__ghost">03</span>
+        </div>
+        <h3 class="qa-card__title">Bank Guarantee</h3>
+        <div class="qa-card__divider"></div>
+        <p>Secure trade and contract guarantees, structured to remain fully Shariah-compliant.</p>
+        <a class="qa-card__cta" href="#">Request a Guarantee <i data-lucide="arrow-right"></i></a>
+      </div>
+      <div class="qa-card">
+        <div class="qa-card__top">
+          <img class="qa-card__img" src="img/tab4.png" alt="ATM debit cards" loading="lazy">
+          <span class="qa-card__ghost">04</span>
+        </div>
+        <h3 class="qa-card__title">ATM Debit Cards</h3>
+        <div class="qa-card__divider"></div>
+        <p>Order or manage your Shariah-compliant ATM debit card in a few taps.</p>
+        <a class="qa-card__cta" href="#">Manage Cards <i data-lucide="arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES / CAROUSEL -->
+<section class="features-section">
+  <div class="wrap">
+    <div class="features-panel" id="featuresPanel" data-reveal style="--reveal-delay:100ms;">
+      <div class="section-head" data-reveal>
+        <h2>Leveraging Technology for Secure, Shariah-Compliant Banking</h2>
+        <p>By combining modern technology with Islamic financial principles, we deliver a comprehensive suite of Shariah-compliant services — empowering individuals and businesses across Afghanistan.</p>
+      </div>
+
+      <div class="carousel-bleed">
+      <div class="carousel">
+        <div class="carousel-track" id="featuresTrack">
+          <div class="carousel-slide" data-slide>
+            <div class="carousel-slide-media">
+              <img src="img/Shariah-Compliant%20EMV%20Debit%20Cards.png" alt="" loading="lazy">
+            </div>
+            <div class="carousel-slide-body">
+              <span class="carousel-eyebrow">Shariah-Compliant Cards</span>
+              <h3>Global Access With Shariah-Compliant Master Debit Cards</h3>
+              <p>Enjoy worldwide acceptance with our chip-enabled, Shariah-compliant master debit cards. Shop online, pay at merchants, and withdraw cash from ATMs across Afghanistan &amp; Overseas — with zero Riba and zero hidden fees.</p>
+              <div class="check-list">
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Contactless, Shariah-compliant payment technology</div>
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Access 100+ Nationwide &amp; 1,000+ International ATMs</div>
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Minimum annual fees · Zero Riba · Full Shariah compliance</div>
+              </div>
+              <a class="btn-primary" href="#">Apply for Your Shariah-Compliant Debit Card
+                <i data-lucide="arrow-right" width="15" height="15" stroke="#fff"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="carousel-slide" data-slide>
+            <div class="carousel-slide-media">
+              <img src="img/Islamic%20Internet%20Banking.png" alt="" loading="lazy">
+            </div>
+            <div class="carousel-slide-body">
+              <span class="carousel-eyebrow">Islamic Internet Banking</span>
+              <h3>Bank Securely From Anywhere With Islamic Internet Banking</h3>
+              <p>Manage your accounts, transfer funds, and pay bills online — all fully Shariah-compliant, encrypted, and available 24/7 from any device.</p>
+              <div class="check-list">
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Real-time balance &amp; transaction tracking</div>
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Free transfers between Ghazanfar Bank accounts</div>
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Bank-grade encryption &amp; two-factor authentication</div>
+              </div>
+              <a class="btn-primary" href="#">Log In to Internet Banking
+                <i data-lucide="arrow-right" width="15" height="15" stroke="#fff"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="carousel-slide" data-slide>
+            <div class="carousel-slide-media">
+              <img src="img/Safe%20Deposit%20Locker.png" alt="" loading="lazy">
+            </div>
+            <div class="carousel-slide-body">
+              <span class="carousel-eyebrow">Safe Deposit Lockers</span>
+              <h3>Keep Valuables Safe With Shariah-Compliant Deposit Lockers</h3>
+              <p>Store important documents, jewelry, and valuables in our secure, branch-based safe deposit lockers — available to all account holders on flexible, ethical terms.</p>
+              <div class="check-list">
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Dual-key access with 24/7 branch security</div>
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Multiple locker sizes to fit your needs</div>
+                <div class="item"><span class="bullet"><i data-lucide="check" stroke-width="3"></i></span> Transparent, Shariah-compliant rental terms</div>
+              </div>
+              <a class="btn-primary" href="#">Reserve a Locker
+                <i data-lucide="arrow-right" width="15" height="15" stroke="#fff"></i>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="qa-panel" data-qa="wu">
-        <div class="qa-panel-foot">
-          <p>Send and receive international money transfers through our Shariah-compliant partner network.</p>
-          <a class="btn-primary" href="#">Send Money
-            <i data-lucide="arrow-right" width="15" height="15" stroke="#fff"></i>
-          </a>
-        </div>
+
+      <div class="carousel-nav" data-reveal>
+        <button class="carousel-arrow" type="button" id="carouselPrev" aria-label="Previous service"><i data-lucide="chevron-left"></i></button>
+        <span class="carousel-counter"><span id="carouselCurrent">1</span>/<span id="carouselTotal">3</span></span>
+        <button class="carousel-arrow" type="button" id="carouselNext" aria-label="Next service"><i data-lucide="chevron-right"></i></button>
       </div>
-      <div class="qa-panel" data-qa="bg">
-        <div class="qa-panel-foot">
-          <p>Secure trade and contract guarantees, structured to remain fully Shariah-compliant.</p>
-          <a class="btn-primary" href="#">Request a Guarantee
-            <i data-lucide="arrow-right" width="15" height="15" stroke="#fff"></i>
-          </a>
-        </div>
-      </div>
-      <div class="qa-panel active" data-qa="atm">
-        <div class="qa-panel-foot">
-          <p>Order or manage your Shariah-compliant ATM debit card in a few taps.</p>
-          <a class="btn-primary" href="#">Manage Cards
-            <i data-lucide="arrow-right" width="15" height="15" stroke="#fff"></i>
-          </a>
-        </div>
-      </div>
-        </div>
       </div>
     </div>
   </div>
@@ -1105,53 +1692,70 @@
 
 <!-- STATS -->
 <section class="stats-section">
-  <video class="stats-section__video" src="img/Banner1.mp4" poster="img/section-img_b1475276b6744ccd8c2530005870944b.avif" autoplay muted loop playsinline aria-hidden="true"></video>
-  <div class="stats-section__scrim" aria-hidden="true"></div>
   <div class="wrap">
-    <div class="stats-grid">
-      <div class="stats-row stats-row--head">
-        <div class="stat-headline" data-reveal><h2>17 Years of Trusted, Shariah-Compliant Banking</h2></div>
-        <div class="stat-box" data-reveal style="--reveal-delay:50ms;">
-          <div class="icon" style="background:rgba(255,255,255,.18);"><i data-lucide="landmark" stroke="#fff"></i></div>
-          <div class="num" data-count="17">17</div><div class="lbl">Branches</div>
-        </div>
-        <div class="stat-box" data-reveal style="--reveal-delay:100ms;">
-          <div class="icon" style="background:rgba(255,255,255,.18);"><i data-lucide="users" stroke="#fff"></i></div>
-          <div class="num" data-count="93176">93,176</div><div class="lbl">Customers</div>
+    <div class="stats-head" data-reveal>
+      <h2>17 Years of Trusted, Shariah-<br>Compliant Banking</h2>
+    </div>
+    <div class="stats-row" style="--reveal-delay:80ms;">
+      <div class="stats-photo">
+        <img src="img/counter.webp" width="1385" height="940" alt="Ghazanfar Bank digital banking on laptop and mobile with card and security shield" loading="lazy">
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__icon"><i data-lucide="users"></i></span>
+        <div>
+          <div class="stat-card__num num" data-count="93176">93,176+</div>
+          <div class="stat-card__lbl">Customers trust Ghazanfar Bank</div>
         </div>
       </div>
-      <div class="stats-row stats-row--figures">
-        <div class="stat-box" data-reveal style="--reveal-delay:150ms;">
-          <div class="icon" style="background:rgba(255,255,255,.18);"><i data-lucide="credit-card" stroke="#fff"></i></div>
-          <div class="num" data-count="28">28</div><div class="lbl">ATM</div>
+      <div class="stat-card stat-card--blue">
+        <span class="stat-card__icon"><i data-lucide="landmark"></i></span>
+        <div>
+          <div class="stat-card__num num" data-count="17">17</div>
+          <div class="stat-card__lbl">Branches serving communities across Afghanistan</div>
         </div>
-        <div class="stat-box" data-reveal style="--reveal-delay:200ms;">
-          <div class="icon" style="background:rgba(255,255,255,.18);"><i data-lucide="id-card" stroke="#fff"></i></div>
-          <div class="num" data-count="530">530</div><div class="lbl">Employees</div>
+      </div>
+      <div class="stat-card stat-card--blue">
+        <span class="stat-card__icon"><i data-lucide="credit-card"></i></span>
+        <div>
+          <div class="stat-card__num num" data-count="28">28</div>
+          <div class="stat-card__lbl">ATMs for cash access, any time you need it</div>
         </div>
-        <div class="stat-box" data-reveal style="--reveal-delay:250ms;">
-          <div class="icon" style="background:rgba(255,255,255,.18);"><i data-lucide="map" stroke="#fff"></i></div>
-          <div class="num" data-count="8">8</div><div class="lbl">Province Coverage</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__icon"><i data-lucide="map"></i></span>
+        <div>
+          <div class="stat-card__num num" data-count="8">8</div>
+          <div class="stat-card__lbl">Provinces with Shariah-compliant banking</div>
         </div>
-        <div class="stat-box" data-reveal style="--reveal-delay:300ms;">
-          <div class="icon" style="background:rgba(255,255,255,.18);"><i data-lucide="award" stroke="#fff"></i></div>
-          <div class="num" data-count="17">17</div><div class="lbl">Years Of Service</div>
-        </div>
+      </div>
+      <div class="stats-photo">
+        <img src="img/Safe%20Deposit%20Locker.png" alt="Shariah-compliant safe deposit lockers at Ghazanfar Bank" loading="lazy">
       </div>
     </div>
   </div>
 </section>
 
 <!-- PARTNERS -->
-<section>
+<section class="partners-section">
   <div class="wrap">
-    <div class="partners-box" data-reveal>
-      <div class="partners-head"><h2>Trusted by Leading Global &amp; Islamic Banking Partners</h2></div>
-      <div class="partners-body">
+    <div class="partners-box" data-reveal role="group" aria-label="Trusted by leading global and Islamic banking partners">
+      <div class="partners-track">
         <span class="plogo"><img src="img/Afghanistan Payments System.png" alt="Afghanistan Payments System"></span>
         <span class="plogo"><img src="img/Asaka Bank.png" alt="Asaka Bank"></span>
         <span class="plogo"><img src="img/Ziraat Bankasi.png" alt="Ziraat Bankası"></span>
         <span class="plogo"><img src="img/Swift.png" alt="SWIFT"></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Afghanistan Payments System.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Asaka Bank.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Ziraat Bankasi.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Swift.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Afghanistan Payments System.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Asaka Bank.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Ziraat Bankasi.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Swift.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Afghanistan Payments System.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Asaka Bank.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Ziraat Bankasi.png" alt=""></span>
+        <span class="plogo" aria-hidden="true"><img src="img/Swift.png" alt=""></span>
       </div>
     </div>
   </div>
@@ -1159,13 +1763,8 @@
 
 <!-- APP PROMO -->
 <section class="app-promo">
-  <div class="app-promo__motif"><div id="appPromoMotif" class="motif"></div></div>
-  <div class="app-promo__scrim" aria-hidden="true"></div>
   <div class="wrap app-promo-grid">
-    <div class="app-promo-visual" id="appPromoVisual">
-      <img src="img/banking app.png" alt="Man holding a phone showing the Ghazanfar Bank app, giving a thumbs up">
-    </div>
-    <div class="app-promo-copy" data-reveal>
+    <div class="app-promo-copy" data-reveal="left">
       <span class="badge-pill">Islamic Mobile Banking App</span>
       <h2>Shariah Banking, Anytime, Anywhere</h2>
       <p>Experience secure and convenient banking at your fingertips. Manage your accounts, transfer funds, and access Shariah-compliant services anytime, anywhere.</p>
@@ -1174,6 +1773,9 @@
         <a href="#" aria-label="Download on the App Store"><img class="store-badge" src="img/Group-5.svg" alt=""></a>
       </div>
     </div>
+    <div class="app-promo-visual" id="appPromoVisual" data-reveal="right" style="--reveal-delay:120ms;">
+      <img src="img/app.png" width="1536" height="1024" alt="Ghazanfar Bank mobile banking app screens" loading="lazy">
+    </div>
   </div>
 </section>
 
@@ -1181,7 +1783,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="newsletter">
+  <div class="newsletter" data-reveal>
     <h3 id="newsletter-heading">Subscribe Newsletter</h3>
     <form class="nl-form" aria-labelledby="newsletter-heading">
       <label class="sr-only" for="newsletter-email">Email address</label>
@@ -1192,7 +1794,7 @@
       </button>
     </form>
   </div>
-  <div class="footer-links-wrap">
+  <div class="footer-links-wrap" data-reveal style="--reveal-delay:80ms;">
     <div class="footer-divider" aria-hidden="true"></div>
     <div class="footer-links-bar">
       <a class="flink" href="#"><i data-lucide="lock" stroke="#fff"></i> Online Banking Login</a>
@@ -1268,54 +1870,133 @@
   document.addEventListener('DOMContentLoaded', function(){
     if(window.lucide) lucide.createIcons();
   });
-  function wireTabs(tabSelector, panelSelector, triggerKey, panelKey){
-    var tabs = Array.from(document.querySelectorAll(tabSelector));
-    var reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    function activate(btn, focus){
-      tabs.forEach(function(b){
-        var isActive = b === btn;
-        b.classList.toggle('active', isActive);
-        b.setAttribute('aria-selected', String(isActive));
-        b.tabIndex = isActive ? 0 : -1;
+  /* Features carousel: an infinite, centre-snapped strip. The three real
+     slides are cloned before and after themselves; whenever the strip settles
+     on a clone it silently jumps to the matching real slide, so it loops with
+     no blank space. Prev/Next and drag both work; desktop mouse drag scrolls
+     the track directly (touch scrolls natively) and a drag longer than a few
+     pixels suppresses the trailing click. */
+  (function(){
+    var track = document.getElementById('featuresTrack');
+    if (!track) return;
+    var real = Array.from(track.querySelectorAll('[data-slide]'));
+    var prevBtn = document.getElementById('carouselPrev');
+    var nextBtn = document.getElementById('carouselNext');
+    var currentEl = document.getElementById('carouselCurrent');
+    var totalEl = document.getElementById('carouselTotal');
+    if (!real.length || !prevBtn || !nextBtn) return;
+    var n = real.length;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    totalEl.textContent = n;
+
+    function clones(){
+      return real.map(function(el){
+        var c = el.cloneNode(true);
+        c.removeAttribute('data-slide');
+        c.setAttribute('data-clone', '');
+        c.setAttribute('aria-hidden', 'true');
+        Array.prototype.forEach.call(c.querySelectorAll('a,button'), function(x){ x.tabIndex = -1; });
+        return c;
       });
-      var panel = document.querySelector(panelSelector + '[data-' + panelKey + '="' + btn.dataset[triggerKey] + '"]');
-      var current = document.querySelector(panelSelector + '.panel-in');
-
-      function enterPanel(){
-        document.querySelectorAll(panelSelector).forEach(function(p){
-          if(p !== panel){ p.style.display = 'none'; p.classList.remove('panel-in', 'panel-out'); }
-        });
-        if(panel){
-          panel.style.display = 'grid';
-          panel.classList.remove('panel-in');
-          void panel.offsetWidth; /* commit the pre-transition state so the class add below is picked up as a change */
-          panel.classList.add('panel-in');
-        }
-        if(focus) btn.focus();
-      }
-
-      if(current && current !== panel && !reducedMotion){
-        current.classList.remove('panel-in');
-        current.classList.add('panel-out');
-        setTimeout(enterPanel, 160); /* exit finishes before the next panel enters */
-      } else {
-        enterPanel();
-      }
     }
-    tabs.forEach(function(btn, i){
-      btn.addEventListener('click', function(){ activate(btn, false); });
-      btn.addEventListener('keydown', function(e){
-        var dir = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 :
-                  e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
-        if(dir){
-          e.preventDefault();
-          var next = tabs[(i + dir + tabs.length) % tabs.length];
-          activate(next, true);
-        }
+    var before = clones(), after = clones();
+    before.forEach(function(c){ track.insertBefore(c, real[0]); });
+    after.forEach(function(c){ track.appendChild(c); });
+    var all = before.concat(real, after);
+
+    function centerOffset(el){
+      var t = track.getBoundingClientRect(), r = el.getBoundingClientRect();
+      return track.scrollLeft + (r.left - t.left) - (t.width - r.width) / 2;
+    }
+    function centerOn(el, smooth){
+      // jumps must bypass smooth-scroll and snapping or they animate/fight
+      track.style.scrollBehavior = smooth && !reduceMotion ? 'smooth' : 'auto';
+      if (!smooth) track.style.scrollSnapType = 'none';
+      track.scrollTo({left: centerOffset(el), behavior: smooth && !reduceMotion ? 'smooth' : 'auto'});
+      if (!smooth) setTimeout(function(){ track.style.scrollSnapType = ''; track.style.scrollBehavior = ''; }, 60);
+    }
+    function nearest(){
+      var t = track.getBoundingClientRect(), mid = t.left + t.width / 2, best = 0, bd = Infinity;
+      all.forEach(function(el, i){
+        var r = el.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - mid);
+        if (d < bd){ bd = d; best = i; }
       });
+      return best;
+    }
+    function updateCounter(){ currentEl.textContent = (nearest() % n) + 1; }
+    function settle(){
+      var i = nearest();
+      if (i < n) centerOn(all[i + n], false);
+      else if (i >= 2 * n) centerOn(all[i - n], false);
+      updateCounter();
+    }
+
+    prevBtn.addEventListener('click', function(){ centerOn(all[nearest() - 1], true); });
+    nextBtn.addEventListener('click', function(){ centerOn(all[nearest() + 1], true); });
+
+    var scrollTimer;
+    track.addEventListener('scroll', function(){
+      updateCounter();
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function(){ if (!isDown) settle(); }, 140);
+    }, {passive: true});
+
+    var isDown = false, startX = 0, startScroll = 0, moved = false;
+    track.addEventListener('pointerdown', function(e){
+      if (e.pointerType === 'touch') return;
+      isDown = true; moved = false;
+      startX = e.clientX;
+      startScroll = track.scrollLeft;
+      track.classList.add('dragging');
+      track.setPointerCapture(e.pointerId);
     });
-  }
-  wireTabs('.tab', '.tab-body', 'tab', 'panel');
+    track.addEventListener('pointermove', function(e){
+      if (!isDown) return;
+      var dx = e.clientX - startX;
+      if (Math.abs(dx) > 3) moved = true;
+      track.scrollLeft = startScroll - dx;
+    });
+    function endDrag(){
+      if (!isDown) return;
+      isDown = false;
+      track.classList.remove('dragging');
+      // let the snap settle on a card, then re-check for the wrap jump
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(settle, 400);
+    }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointerleave', endDrag);
+    track.addEventListener('click', function(e){
+      if (moved){ e.preventDefault(); e.stopPropagation(); }
+    }, true);
+
+    function init(){ centerOn(real[0], false); updateCounter(); }
+    init();
+    window.addEventListener('load', init);
+    window.addEventListener('resize', function(){ centerOn(all[nearest()], false); });
+  })();
+
+  /* Stats tiles: pathLength=1 lets the icon-draw animation use a simple 0->1 dash,
+     and pointer position feeds the gold spotlight. */
+  (function(){
+    function prep(){
+      document.querySelectorAll('.stat-card__icon svg *').forEach(function(el){ el.setAttribute('pathLength','1'); });
+    }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(prep, 0); });
+    window.addEventListener('load', prep);
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    document.querySelectorAll('.stat-card').forEach(function(card){
+      card.addEventListener('pointermove', function(e){
+        var r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        card.style.setProperty('--ry', (((e.clientX - r.left) / r.width - .5) * 10).toFixed(2) + 'deg');
+        card.style.setProperty('--rx', ((.5 - (e.clientY - r.top) / r.height) * 8).toFixed(2) + 'deg');
+      });
+      card.addEventListener('pointerleave', function(){ card.style.setProperty('--rx','0deg'); card.style.setProperty('--ry','0deg'); });
+    });
+  })();
 
   function closeAllDropdowns(except){
     document.querySelectorAll('.nav-item .dropdown').forEach(function(dd){
@@ -1325,9 +2006,34 @@
       if(trigger) trigger.setAttribute('aria-expanded', 'false');
     });
   }
+  /* desktop + mouse: menus open on hover (with a short close delay so the pointer
+     can travel to the panel); touch/keyboard/narrow screens keep click-to-toggle */
+  var hoverMQ = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 901px)');
+  document.querySelectorAll('.nav-item').forEach(function(item){
+    var trigger = item.querySelector(':scope > button[aria-haspopup="true"]');
+    var dd = trigger && trigger.nextElementSibling;
+    if (!dd) return;
+    var timer;
+    item.addEventListener('mouseenter', function(){
+      if (!hoverMQ.matches) return;
+      clearTimeout(timer);
+      closeAllDropdowns(dd);
+      dd.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+    });
+    item.addEventListener('mouseleave', function(){
+      if (!hoverMQ.matches) return;
+      clearTimeout(timer);
+      timer = setTimeout(function(){
+        dd.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+      }, 220);
+    });
+  });
   document.querySelectorAll('.nav-item > button[aria-haspopup="true"]').forEach(function(trigger){
     trigger.addEventListener('click', function(){
       var dd = trigger.nextElementSibling;
+      if (hoverMQ.matches && !dd.hidden) return; // already open from hover
       var willOpen = dd.hidden;
       closeAllDropdowns(willOpen ? dd : null);
       dd.hidden = !willOpen;
@@ -1571,6 +2277,20 @@
      already visible by default if this script never runs. */
   (function(){
     if (!document.documentElement.classList.contains("has-js")) return;
+    /* card grids: each child reveals on its own with a 70ms stagger instead
+       of the container fading as one block. The attribute is dropped once
+       the entrance is done so hover transitions on the cards aren't left
+       sharing the reveal's transition/delay. */
+    ["#quickDuplicate .qa-grid", ".fx-row", ".about-features", ".stats-row", ".footer-main"].forEach(function(sel){
+      var box = document.querySelector(sel);
+      if (!box) return;
+      box.removeAttribute("data-reveal");
+      Array.prototype.forEach.call(box.children, function(child, i){
+        child.setAttribute("data-reveal", "");
+        child.style.setProperty("--reveal-delay", (i * 70) + "ms");
+        child.setAttribute("data-reveal-once", "");
+      });
+    });
     var targets = document.querySelectorAll("[data-reveal]");
     if (!targets.length) return;
     if (!("IntersectionObserver" in window)){
@@ -1580,12 +2300,51 @@
     var io = new IntersectionObserver(function(entries, obs){
       entries.forEach(function(entry){
         if (entry.isIntersecting){
-          entry.target.classList.add("in-view");
-          obs.unobserve(entry.target);
+          var t = entry.target;
+          t.classList.add("in-view");
+          obs.unobserve(t);
+          if (t.hasAttribute("data-reveal-once")){
+            setTimeout(function(){ t.removeAttribute("data-reveal"); t.style.removeProperty("--reveal-delay"); }, 2000);
+          }
         }
       });
     }, {threshold: 0.15, rootMargin: "0px 0px -8% 0px"});
     targets.forEach(function(el){ io.observe(el); });
+  })();
+
+  /* Scroll-expand image: as the .about-img box travels up through the
+     viewport it grows from 78% of the page's content width to a full-
+     bleed, edge-to-edge viewport width, and its corners straighten from
+     28px to 0 — read off securevest.netlify.app's about-section image
+     (a GSAP ScrollTrigger scrub there; plain scroll math here).
+     Skipped for reduced-motion visitors, who get the fully-expanded,
+     unrounded end state via the CSS media query instead. */
+  (function(){
+    var el = document.querySelector(".about-img");
+    if (!el) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var wrap = el.previousElementSibling; // the .wrap holding the heading/features, for the 78% basis
+    var MIN_R = 28, MAX_R = 0;
+    var ticking = false;
+    function update(){
+      ticking = false;
+      if (window.innerWidth <= 900) return; // mobile/tablet: CSS locks it to a fixed width
+      var minW = (wrap ? wrap.clientWidth : window.innerWidth) * 0.78;
+      var maxW = window.innerWidth; // full-bleed, edge to edge
+      var rect = el.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var start = vh;        // progress 0: box top at the bottom edge of the viewport
+      var end = vh * 0.35;   // progress 1: box top has travelled to ~35% down the viewport
+      var progress = Math.min(1, Math.max(0, (start - rect.top) / (start - end)));
+      el.style.width = (minW + (maxW - minW) * progress) + "px";
+      el.style.borderRadius = (MIN_R + (MAX_R - MIN_R) * progress) + "px";
+    }
+    function onScroll(){
+      if (!ticking){ requestAnimationFrame(update); ticking = true; }
+    }
+    window.addEventListener("scroll", onScroll, {passive: true});
+    window.addEventListener("resize", onScroll);
+    update();
   })();
 
   /* Stat counters: count up to their target value the moment their card
@@ -1593,7 +2352,7 @@
      the markup already shows the final number if JS never runs. */
   (function(){
     if (!document.documentElement.classList.contains("has-js")) return;
-    var nums = document.querySelectorAll(".stat-box .num[data-count]");
+    var nums = document.querySelectorAll(".stat-card .num[data-count]");
     if (!nums.length || !("IntersectionObserver" in window)) return;
     function animateCount(el){
       var end = parseInt(el.getAttribute("data-count"), 10);
@@ -1619,15 +2378,6 @@
       });
     }, {threshold: 0.6});
     nums.forEach(function(el){ io.observe(el); });
-  })();
-
-  (function(){
-    var bgVideo = document.querySelector('.stats-section__video');
-    if (!bgVideo) return;
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches){
-      bgVideo.removeAttribute('autoplay');
-      bgVideo.pause();
-    }
   })();
 
   /* Drives a 0..1 progress value from scroll position while `trigger`'s
@@ -1681,67 +2431,40 @@
     });
   })();
 
-  /* Features panel background: starts at the page's normal container width
-     (matching every other row on the page) and grows to the full page
-     width, edge-to-edge, as the user scrolls through — the width-grow read
-     off securevest.netlify.app's About section, applied to this panel's
-     background instead of a photo. */
   (function(){
-    var panel = document.getElementById("featuresPanel");
-    var bg = panel ? panel.querySelector(".features-panel__bg") : null;
-    if (!bg) return;
-    scrollLinkedProgress(panel, function(progress){
-      // panel itself already sits at the page's normal container width (no
-      // side padding of its own), so its current width IS the start width
-      var startWidth = panel.getBoundingClientRect().width;
-      var endWidth = document.documentElement.clientWidth;
-      var startRadius = 32, endRadius = 0;
-      // vertical grow mirrors the horizontal one: starts flush with the
-      // content (no padding covered) and extends into the panel's own 64px
-      // top/bottom padding as the user scrolls through, so the reveal reads
-      // as two-directional rather than width-only.
-      var startInsetY = 64, endInsetY = 0;
-      var width = startWidth + (endWidth - startWidth) * progress;
-      var radius = startRadius + (endRadius - startRadius) * progress;
-      var insetY = startInsetY + (endInsetY - startInsetY) * progress;
-      bg.style.setProperty("--bg-width", width.toFixed(2) + "px");
-      bg.style.setProperty("--bg-radius", Math.max(radius, 0).toFixed(2) + "px");
-      bg.style.setProperty("--bg-inset-y", Math.max(insetY, 0).toFixed(2) + "px");
-    });
+    var el = document.getElementById("fxUpdated");
+    if (!el) return;
+    var d = new Date();
+    var date = d.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"});
+    var time = d.toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"});
+    el.textContent = "Updated " + date + " · " + time;
   })();
 
-  /* Quick Access row-select: click a row to swap the white detail panel to
-     match it. No auto-advance — plain click-to-select. */
-  (function(){
-    var list = document.getElementById("qaList");
-    if (!list) return;
-    var rows = Array.from(list.querySelectorAll(".qa-row"));
-    var panels = Array.from(document.querySelectorAll(".qa-panel"));
-    var visualImg = document.getElementById("qaVisualImg");
-    if (!rows.length) return;
+  /* Quick Access accordion: clicking a row toggles it open, closing
+     whichever other row was open — plain click-to-toggle, no auto-advance
+     or progress indicator. Binds independently to every .qa-list on the
+     page (there can be more than one — e.g. a hidden duplicate kept
+     around for quick A/B swapping), each with its own open/closed state. */
+  document.querySelectorAll(".qa-list").forEach(function(list){
+    var items = Array.from(list.querySelectorAll(".qa-item"));
+    if (!items.length) return;
 
-    var images = {
-      login: "img/Islamic%20Online%20Banking%20Login.png",
-      wu: "img/western%20union.png",
-      bg: "img/Bank%20Guarantee.png",
-      atm: "img/ATM%20Debit%20Card.png"
-    };
-
-    rows.forEach(function(row){
-      row.addEventListener("click", function(){
-        var key = row.getAttribute("data-qa");
-        rows.forEach(function(r){ r.classList.toggle("active", r === row); });
-        panels.forEach(function(p){ p.classList.toggle("active", p.getAttribute("data-qa") === key); });
-        if (visualImg && images[key]) {
-          visualImg.style.opacity = "0";
-          setTimeout(function(){
-            visualImg.src = images[key];
-            visualImg.style.opacity = "1";
-          }, 180);
-        }
+    function goTo(index){
+      var wasActive = items[index].classList.contains("active");
+      items.forEach(function(it, i){
+        var isActive = i === index ? !wasActive : false;
+        it.classList.toggle("active", isActive);
+        var row = it.querySelector(".qa-row");
+        if (row) row.setAttribute("aria-expanded", isActive ? "true" : "false");
       });
+    }
+
+    items.forEach(function(it, i){
+      var row = it.querySelector(".qa-row");
+      if (!row) return;
+      row.addEventListener("click", function(){ goTo(i); });
     });
-  })();
+  });
 
   /* Floating contact button: toggles open/closed on click, revealing the
      call/message circles above it. Closes on an outside click, Escape, or
@@ -1767,6 +2490,83 @@
       if (e.key === "Escape") setOpen(false);
     });
   })();
+</script>
+<script>
+/* AnimatedBankCards: scroll-scrubbed fan for the hero cards. No GSAP on this
+   site, so this is plain scroll math (same approach as the About image):
+   progress = scrollY over the hero's scroll range, eased, then lerped each
+   frame (the "scrub: 1.2" smoothing). Tune FAN / SMOOTH / TABLET / FLOAT. */
+(function(){
+  var root = document.getElementById("heroCards");
+  if (!root) return;
+  var cards = {
+    black: root.querySelector('[data-card="black"]'),
+    green: root.querySelector('[data-card="green"]'),
+    back:  root.querySelector('[data-card="back"]')
+  };
+  /* stack -> fan, in px at a 600px-wide visual. r = rotate, ry = rotateY,
+     s = scale, sh = [shadowY, blur, alpha] */
+  var FAN = {
+    black:{ from:{x:0,y:0,r:-2,ry:-2,s:1,   sh:[10,22,.10]}, to:{x:70, y:35, r:8,  ry:1, s:1,   sh:[30,60,.16]} },
+    green:{ from:{x:0,y:0,r:0, ry:2, s:.96, sh:[8,18,.08]},  to:{x:-40,y:-90,r:-10,ry:-1,s:.96, sh:[24,50,.13]} },
+    back: { from:{x:0,y:0,r:2, ry:3, s:.92, sh:[6,14,.06]},  to:{x:-100,y:30,r:-18,ry:-1,s:.92, sh:[18,40,.11]} }
+  };
+  var MOBILE = { black:{x:0,y:0,r:5}, green:{x:-25,y:-28,r:-8}, back:{x:25,y:20,r:10} };
+  var SMOOTH = 0.07;   /* per-frame lerp: lower = slower/floatier (~1.2s scrub) */
+  var TABLET = 0.7;    /* travel multiplier for 768-1199px */
+  var FLOAT = 5;       /* idle float amplitude, px */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var range = 400, cur = 0, target = 0, raf = 0, k = 1, mode = "desktop";
+
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function ease(t){ return t*t*(3-2*t); }
+  function measure(){
+    var w = window.innerWidth;
+    mode = w < 768 ? "mobile" : (w < 1200 ? "tablet" : "desktop");
+    k = (root.offsetWidth / 600) * (mode === "tablet" ? TABLET : 1);
+    /* fan finishes while the cards are still comfortably on screen */
+    var rb = root.getBoundingClientRect();
+    range = Math.max(120, rb.height * 0.3);
+  }
+  function progress(){
+    if (reduce.matches || mode === "mobile") return 1;
+    return Math.min(1, Math.max(0, window.pageYOffset / range));
+  }
+  function paint(p){
+    var e = ease(p);
+    ["black","green","back"].forEach(function(n){
+      var el = cards[n], f = FAN[n];
+      if (mode === "mobile"){
+        var m = MOBILE[n], mk = root.offsetWidth / 300;
+        el.style.transform = "translate3d("+(m.x*mk).toFixed(1)+"px,"+(m.y*mk).toFixed(1)+"px,0) rotate("+m.r+"deg) scale("+f.to.s+")";
+        el.style.filter = "drop-shadow(0 "+(f.to.sh[0]*.6)+"px "+(f.to.sh[1]*.6)+"px rgba(0,0,0,"+f.to.sh[2]+"))";
+        return;
+      }
+      var x = lerp(f.from.x,f.to.x,e)*k, y = lerp(f.from.y,f.to.y,e)*k;
+      el.style.transform = "translate3d("+x.toFixed(2)+"px,"+y.toFixed(2)+"px,0) rotate("+lerp(f.from.r,f.to.r,e).toFixed(3)+"deg) rotateY("+lerp(f.from.ry,f.to.ry,e).toFixed(3)+"deg) scale("+lerp(f.from.s,f.to.s,e).toFixed(4)+")";
+      el.style.filter = "drop-shadow(0 "+lerp(f.from.sh[0],f.to.sh[0],e).toFixed(1)+"px "+lerp(f.from.sh[1],f.to.sh[1],e).toFixed(1)+"px rgba(0,0,0,"+lerp(f.from.sh[2],f.to.sh[2],e).toFixed(3)+"))";
+    });
+    /* idle float only fades in once the fan is (nearly) open */
+    var fl = reduce.matches ? 0 : (mode === "mobile" ? FLOAT*.7 : FLOAT * Math.min(1, Math.max(0,(p-.9)/.1)));
+    root.style.setProperty("--float", fl.toFixed(2)+"px");
+  }
+  function tick(){
+    raf = 0;
+    target = progress();
+    cur += (target - cur) * SMOOTH;
+    if (Math.abs(target - cur) < .0005) cur = target;
+    paint(cur);
+    if (cur !== target) raf = requestAnimationFrame(tick);
+  }
+  function kick(){ if (!raf) raf = requestAnimationFrame(tick); }
+  function jump(){ measure(); target = cur = progress(); paint(cur); }
+  window.addEventListener("scroll", kick, {passive:true});
+  window.addEventListener("resize", jump);
+  window.addEventListener("load", jump);
+  if (reduce.addEventListener) reduce.addEventListener("change", jump);
+  jump();
+})();
+  (function(){ var v=document.querySelector('.about-img video'); if(v && window.matchMedia('(prefers-reduced-motion: reduce)').matches){ v.removeAttribute('autoplay'); v.pause(); } })();
 </script>
 </body>
 </html>
