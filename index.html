@@ -56,37 +56,8 @@
     --dur-l:1s;
     --nav-h:132px;
   }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#0b1220;
-      --page-bg:#0b1220;
-      --card-bg:#111a2c;
-      --nav-glass-bg:rgba(11,18,32,.55);
-      --ink:#f1f5f9;
-      --body-text:#c3cbd6;
-      --muted:#94a3b8;
-      --line:#233047;
-      --motif-tint:#16223a;
-      --motif-line-star:rgba(147,197,253,.20);
-      --motif-line-cross:rgba(147,197,253,.13);
-      --motif-node:rgba(250,204,21,.09);
-      --scrim-rgb:11,18,32;
-    }
-  }
-  :root[data-theme="dark"]{
-    --bg:#0b1220;
-    --page-bg:#0b1220;
-    --card-bg:#111a2c;
-    --ink:#f1f5f9;
-    --body-text:#c3cbd6;
-    --muted:#94a3b8;
-    --line:#233047;
-    --motif-tint:#16223a;
-    --motif-line-star:rgba(147,197,253,.20);
-    --motif-line-cross:rgba(147,197,253,.13);
-    --motif-node:rgba(250,204,21,.09);
-    --scrim-rgb:11,18,32;
-  }
+  /* light theme only: keep the same colours regardless of the visitor's OS dark/night setting */
+  :root{color-scheme:light;}
 
   *{box-sizing:border-box;}
   /* baseline: anything interactive that has no transition of its own still eases */
