@@ -1295,6 +1295,16 @@
   .primary-nav{justify-self:center;}
   .nav-right{justify-self:end;gap:2px;}
   @media (max-width:900px){ .nav-inner{grid-template-columns:auto 1fr auto;} }
+
+  /* header: links centred in the space between the logo and the language/login/CTA group;
+     language + login pulled tight together */
+  .nav-inner{grid-template-columns:auto 1fr auto;}
+  .primary-nav{justify-self:center;}
+  .nav-right{justify-self:end;gap:0;}
+  .nav-right .lang{padding-left:6px;padding-right:6px;}
+  .nav-right .nav-item + .nav-item .lang{margin-left:-4px;}
+  .nav-right .nav-open-acct{margin-left:12px;}
+  @media (max-width:900px){ .nav-open-acct{margin-left:0;} }
 </style>
 <script>
   /* Runs before first paint so [data-reveal] only hides content when JS is
