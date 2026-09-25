@@ -1305,6 +1305,12 @@
   .nav-right .nav-item + .nav-item .lang{margin-left:-4px;}
   .nav-right .nav-open-acct{margin-left:12px;}
   @media (max-width:900px){ .nav-open-acct{margin-left:0;} }
+
+  /* language + login: globe / user icons, small right-pointing chevron that turns down when open */
+  .nav-right .nav-item + .nav-item .lang{margin-left:14px;}
+  .lang[aria-expanded="true"] .chev{transform:rotate(90deg);}
+  .nav-right .lang svg:not(.chev){width:18px;height:18px;}
+  .nav-right .lang .chev{width:11px;height:11px;opacity:.55;}
 </style>
 <script>
   /* Runs before first paint so [data-reveal] only hides content when JS is
@@ -1441,7 +1447,7 @@
       <button class="lang" type="button" aria-haspopup="true" aria-expanded="false">
         <i data-lucide="globe"></i>
         EN
-        <i data-lucide="chevron-down" class="chev"></i>
+        <i data-lucide="chevron-right" class="chev"></i>
       </button>
       <div class="dropdown" hidden>
         <a href="#">English</a>
@@ -1452,9 +1458,9 @@
     </div>
     <div class="nav-item">
       <button class="lang login-trigger" type="button" aria-haspopup="true" aria-expanded="false">
-        <i data-lucide="log-in"></i>
+        <i data-lucide="user"></i>
         Login
-        <i data-lucide="chevron-down" class="chev"></i>
+        <i data-lucide="chevron-right" class="chev"></i>
       </button>
       <div class="dropdown" hidden>
         <a href="#"><i data-lucide="log-in"></i> Online Banking</a>
