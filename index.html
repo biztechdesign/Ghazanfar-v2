@@ -1266,6 +1266,28 @@
   .about-feature:hover .read-more{color:#fff;}
   .about-feature:hover .about-feature__icon{background:rgba(255,255,255,.18);color:#fff;transform:scale(1.08);}
   @media (prefers-reduced-motion: reduce){ .about-feature::before, .about-feature::after{transition:none;} .about-feature::after{display:none;} }
+
+  /* MEGAMENU HOVER: very subtle — a faint tint and a colour shift, nothing moves */
+  .megamenu-col-list a:hover, .megamenu-card:hover{transform:none!important;}
+  .megamenu-col-list a:hover{background:rgba(7,59,50,.035);color:var(--forest);}
+  .megamenu-card:hover{background:rgba(7,59,50,.035);border-color:transparent;box-shadow:none;}
+  .megamenu-card:hover .megamenu-card-icon{transform:none;background:var(--forest);}
+  .megamenu-card:hover .megamenu-card-text strong{color:var(--forest);}
+  .megamenu-col:hover .megamenu-col-head::after{width:0;}
+  .megamenu-col-list a, .megamenu-card, .megamenu-card-text strong{transition-duration:.45s;}
+
+  /* entrance: travel further from below so the rise reads clearly (blocks 48px, copy 28px) */
+  .has-js [data-reveal]{transform:translateY(48px);transition:opacity .85s var(--ease), transform .95s var(--ease);}
+  .has-js [data-reveal="fade"]{transform:none;}
+  .has-js [data-reveal="left"]{transform:translateX(-32px);}
+  .has-js [data-reveal="right"]{transform:translateX(32px);}
+  .has-js [data-reveal="zoom"]{transform:scale(.97);}
+  .has-js [data-reveal].in-view{transform:none;}
+  .has-js [data-reveal] :is(h2, h3, p, .read-more, .fx-item__body){transform:translateY(28px);transition:opacity .85s var(--ease), transform .95s var(--ease);}
+  .has-js [data-reveal].in-view :is(h2, h3, p, .read-more, .fx-item__body){transform:none;}
+  .has-js [data-reveal].in-view :is(h2, h3){transition-delay:.15s;}
+  .has-js [data-reveal].in-view :is(p){transition-delay:.3s;}
+  .has-js [data-reveal].in-view :is(.read-more){transition-delay:.45s;}
 </style>
 <script>
   /* Runs before first paint so [data-reveal] only hides content when JS is
@@ -2394,7 +2416,7 @@
           t.classList.add("in-view");
           obs.unobserve(t);
           if (t.hasAttribute("data-reveal-once")){
-            setTimeout(function(){ t.removeAttribute("data-reveal"); t.style.removeProperty("--reveal-delay"); }, 2000);
+            setTimeout(function(){ t.removeAttribute("data-reveal"); t.style.removeProperty("--reveal-delay"); }, 2600);
           }
         }
       });
