@@ -96,7 +96,11 @@
   html{scroll-behavior:smooth;}
   @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} :where(a,button,input,textarea,select,summary){transition:none;} }
 
-  html,body{margin:0;padding:0;overflow-x:hidden;}
+  html,body{margin:0;padding:0;}
+  /* html clips sideways overflow for the page; body uses `clip` (not `hidden`) so it does NOT
+     become its own scroll container — two hidden overflows caused a second inner scrollbar */
+  html{overflow-x:hidden;}
+  body{overflow-x:clip;}
   body{
     font-family:'Onest',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     background:var(--page-bg);
@@ -1311,6 +1315,13 @@
   .lang[aria-expanded="true"] .chev{transform:rotate(90deg);}
   .nav-right .lang svg:not(.chev){width:18px;height:18px;}
   .nav-right .lang .chev{width:11px;height:11px;opacity:.55;}
+
+  /* scrolled header: stronger glass + darker, heavier menu text so it stays legible over content */
+  :root{--nav-glass-bg:rgba(242,242,232,.92);}
+  .nav.scrolled .primary-nav > a, .nav.scrolled .primary-nav .menu, .nav.scrolled .lang, .nav.scrolled .login-trigger{
+    color:var(--ink);font-weight:600;}
+  .nav.scrolled .primary-nav > a:hover, .nav.scrolled .primary-nav .menu:hover, .nav.scrolled .primary-nav .menu[aria-expanded="true"]{color:var(--forest);}
+  .nav.scrolled .lang .chev, .nav.scrolled .primary-nav .chev{opacity:.7;}
 </style>
 <script>
   /* Runs before first paint so [data-reveal] only hides content when JS is
@@ -2651,7 +2662,8 @@
   var TABLET = 0.7;    /* travel multiplier for 768-1199px */
   var FLOAT = 5;       /* idle float amplitude, px */
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var range = 400, cur = 0, target = 0, raf = 0, k = 1, mode = "desktop";
+  var range = 400, cur = 0, target = 0, raf = 0, k = 1, mode = "desktop", intro = false;
+  var INTRO_DELAY = 700, INTRO_SMOOTH = 0.035;   /* load: start fanned open, then fold shut */
 
   function lerp(a,b,t){ return a + (b-a)*t; }
   function ease(t){ return t*t*(3-2*t); }
@@ -2688,18 +2700,24 @@
   function tick(){
     raf = 0;
     target = progress();
-    cur += (target - cur) * SMOOTH;
-    if (Math.abs(target - cur) < .0005) cur = target;
+    cur += (target - cur) * (intro ? INTRO_SMOOTH : SMOOTH);
+    if (Math.abs(target - cur) < .0005){ cur = target; intro = false; }
     paint(cur);
     if (cur !== target) raf = requestAnimationFrame(tick);
   }
   function kick(){ if (!raf) raf = requestAnimationFrame(tick); }
-  function jump(){ measure(); target = cur = progress(); paint(cur); }
+  function jump(){ measure(); if (intro) return; target = cur = progress(); paint(cur); }
   window.addEventListener("scroll", kick, {passive:true});
   window.addEventListener("resize", jump);
   window.addEventListener("load", jump);
   if (reduce.addEventListener) reduce.addEventListener("change", jump);
   jump();
+  /* page load: show the cards fanned open, then animate them closed into the stack.
+     Scrolling afterwards opens the fan again. (Not for mobile / reduced motion.) */
+  if (!reduce.matches && mode !== "mobile" && progress() < 1){
+    intro = true; cur = 1; target = 1; paint(1);
+    setTimeout(function(){ kick(); }, INTRO_DELAY);
+  }
 })();
   (function(){ var v=document.querySelector('.about-img video'); if(v && window.matchMedia('(prefers-reduced-motion: reduce)').matches){ v.removeAttribute('autoplay'); v.pause(); } })();
 </script>
