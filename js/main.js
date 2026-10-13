@@ -323,7 +323,8 @@
     var items = $$('[data-rise]');
     if (!MOTION){ return; }
     $$('[data-stagger]').forEach(function(group){
-      $$('[data-rise]', group).forEach(function(el, i){ el.style.setProperty('--delay', (i * 0.2) + 's'); });
+      var step = parseFloat(group.getAttribute('data-stagger')) || 0.2;      // per-group override, e.g. data-stagger=".35"
+      $$('[data-rise]', group).forEach(function(el, i){ el.style.setProperty('--delay', (i * step).toFixed(2) + 's'); });
     });
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
