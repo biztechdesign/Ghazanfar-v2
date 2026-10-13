@@ -190,15 +190,30 @@ ul{margin:0;padding:0;list-style:none;}
 html.is-loading{overflow:hidden;}
 
 /* ---------- 6. HEADER ---------- */
-.site-header{position:fixed;inset:0 0 auto;z-index:1000;border-bottom:1px solid var(--c-border-inv);
-  transition:transform .4s var(--ease-out-2);will-change:transform;}
-.site-header.is-scrolled{box-shadow:0 8px 24px -12px rgba(0,20,50,.45);}
-/* glass over blue: a permanent blurred layer behind the bar; only its colour's alpha changes (opaque at the
-   top, translucent once scrolled) because backdrop-filter itself can't be tweened */
-.site-header::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:rgb(0,68,148);
-  -webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);transition:background-color .5s var(--ease-out-2);}
-.site-header.is-scrolled::before{background:rgba(0,68,148,.78);}
+.site-header{position:fixed;inset:0 0 auto;z-index:1000;border-bottom:1px solid transparent;
+  transition:transform .4s var(--ease-out-2),border-color .5s var(--ease-out-2),box-shadow .5s var(--ease-out-2);will-change:transform;}
+.site-header.is-scrolled{border-bottom-color:var(--c-border);box-shadow:0 4px 20px -8px rgba(16,24,40,.12);}
+/* glass: transparent over the hero at the top; once scrolled a light frosted layer fades in. The layer is
+   permanent and only its opacity changes (backdrop-filter itself can't be tweened) */
+.site-header::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:rgba(246,245,238,.78);
+  -webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);opacity:0;transition:opacity .5s var(--ease-out-2);}
+.site-header.is-scrolled::before{opacity:1;}
 .site-header.is-hidden{transform:translateY(-100%);transition:transform .2s var(--ease-in-out-2);}
+/* the hero runs up behind the transparent bar */
+.hero{margin-top:calc(-1 * var(--header-h));}
+.hero__grid{padding-top:var(--header-h);}
+/* logo + text crossfade light -> dark with the glass */
+.brand{position:relative;}
+.brand picture + picture{position:absolute;left:0;top:50%;transform:translateY(-50%);opacity:0;pointer-events:none;}
+.brand picture{transition:opacity .5s var(--ease-out-2);}
+.brand img{transition:height .5s var(--ease-out-2);}
+.is-scrolled .brand img{height:48px;}  /* compact bar once scrolled, as the old header */
+.is-scrolled .brand picture:first-child{opacity:0;}
+.is-scrolled .brand picture + picture{opacity:1;}
+.nav-link,.util-btn,.menu-toggle{transition:transform var(--d-fast),color .5s var(--ease-out-2);}
+.is-scrolled .nav-link,.is-scrolled .util-btn,.is-scrolled .menu-toggle{color:var(--c-title);}
+.is-scrolled .nav-link:hover,.is-scrolled .nav-link[aria-expanded="true"],.is-scrolled .util-btn:hover{color:var(--brand-blue);}
+.is-scrolled .nav-link::before,.is-scrolled .nav-link::after{background:var(--c-accent-strong);}
 .header-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;height:var(--header-h);}
 .brand{display:flex;align-items:center;flex-shrink:0;}
 .brand img{height:56px;width:auto;}
