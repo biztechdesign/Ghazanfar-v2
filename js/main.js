@@ -297,9 +297,9 @@
     titles.forEach(function(t){
       var chars = $('[data-split="chars"]', t), words = $('[data-split="words"]', t), lines = $('[data-split="lines"]', t);
       var c = chars ? splitChars(chars) : [], w = words ? splitWords(words) : [], l = lines ? splitLines(lines) : null;
-      var tEye = stagger(c, 0.2, 0.008, 0.4);
-      var tHead = stagger(w, Math.max(tEye, 1) - 0.6, 0.06, 0.6);
-      var tEnd = l ? stagger(l.inners, tHead - 0.5, 0.08, 0.6) : tHead;
+      var tEye = stagger(c, 0.2, 0.008, 0.75);                          // eyebrow .75s
+      var tHead = stagger(w, Math.max(tEye, 1) - 0.6, 0.08, 0.9);        // heading .9s
+      var tEnd = l ? stagger(l.inners, tHead - 0.6, 0.1, 0.85) : tHead;  // description .85s
       t._restore = l ? l.restore : null; t._end = tEnd;
       t.classList.add('is-ready');
     });
@@ -323,7 +323,7 @@
     var items = $$('[data-rise]');
     if (!MOTION){ return; }
     $$('[data-stagger]').forEach(function(group){
-      $$('[data-rise]', group).forEach(function(el, i){ el.style.setProperty('--delay', (i * 0.2) + 's'); });
+      $$('[data-rise]', group).forEach(function(el, i){ el.style.setProperty('--delay', (i * 0.12) + 's'); });
     });
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
@@ -335,10 +335,10 @@
           io.unobserve(x);
           x.classList.add('is-in');
           var d = parseFloat(x.style.getPropertyValue('--delay')) || 0;
-          setTimeout(function(){ x.classList.add('is-settled'); }, (d + 0.7) * 1000);
+          setTimeout(function(){ x.classList.add('is-settled'); }, (d + 1.1) * 1000);
         });
       });
-    }, {rootMargin: '0px 0px -15% 0px'});
+    }, {rootMargin: '0px 0px -25% 0px'});
     items.forEach(function(el){ io.observe(el); });
   }
 
@@ -456,8 +456,8 @@
     io.observe(el);
   }
   function initGridReveal(){
-    gridReveal($('#expandMedia'), {xl:[12,12], lg:[10,10], sm:[5,5], stagger:.002, duration:.2, trigger:0});
-    gridReveal($('#siteFooter'), {xl:[15,6], lg:[10,6], sm:[5,16], stagger:.004, duration:.5, trigger:30});
+    gridReveal($('#expandMedia'), {xl:[12,12], lg:[10,10], sm:[5,5], stagger:.004, duration:.6, trigger:30});   // reference video: top 70%, .004s, .6s
+    gridReveal($('#siteFooter'), {xl:[15,6], lg:[10,6], sm:[5,16], stagger:.007, duration:.9, trigger:30});   // reference: .004s/.5s; slowed ~1.7x on request
   }
 
   onReady(function(){
@@ -544,15 +544,20 @@
     window.addEventListener('resize', function(){ centerOn(all[nearest()], false); });
 
     if (!reduce){
-      var AUTOPLAY_MS = 3000, timer = null, root2 = track.closest('.carousel-bleed') || track;
+      var AUTOPLAY_MS = 3000, timer = null, inView = false, root2 = track.closest('.carousel-bleed') || track;
       function stop(){ clearInterval(timer); timer = null; }
-      function start(){ stop(); timer = setInterval(function(){ if (!isDown && !document.hidden) centerOn(all[nearest() + 1], true); }, AUTOPLAY_MS); }
+      function start(){ stop(); timer = setInterval(function(){ if (!isDown && !document.hidden && inView) centerOn(all[nearest() + 1], true); }, AUTOPLAY_MS); }
       root2.addEventListener('mouseenter', stop);
       root2.addEventListener('mouseleave', start);
       root2.addEventListener('focusin', stop);
       root2.addEventListener('focusout', function(){ if (!root2.contains(document.activeElement)) start(); });
       document.addEventListener('visibilitychange', function(){ if (document.hidden) stop(); else start(); });
-      onReady(start);
+      // autoplay only while the carousel is on screen and has finished rising in, so the slides never
+      // slide sideways while the section is still revealing (bottom -> top only)
+      new IntersectionObserver(function(en){
+        inView = en[0].isIntersecting;
+        if (inView) setTimeout(function(){ if (inView) start(); }, 1200); else stop();
+      }, {threshold: .35}).observe(root2);
     }
   })();
 
@@ -677,63 +682,55 @@
   })();
 
   /* ======================================================================
-     HERO CARD FAN — modelled on the reference "Borderless Banking" cards:
-     the three cards start stacked on one shared tilt (there: rotate 45,
-     skewX -20) and spread into separate rotate/skew poses. Pure transforms
-     (no per-frame filter work), frame-rate-independent smoothing like GSAP
-     "scrub: .5". On reveal the stack fans open; scrolling then spreads the
-     fan a little further, scrubbed to the scroll position.
-     Poses: px at a 600px-wide box, degrees. Tune STACK / FAN / SPREAD.
+     HERO CARD FAN — the reference "Borderless Banking" stack, same numbers:
+     all three cards start on one shared pose (rotate 45, skewX -20, origin
+     95% 80%) and scrub into separate poses (card-3 rot 85/skewX -10/skewY -7,
+     y -55, x 10; card-2 rot 67/skewX -15/skewY -3; card-1 rot 70/skewX -5/
+     skewY -22, y 20, x -15). Reference: ScrollTrigger "top 50%" -> "top 20%",
+     scrub .5, linear. Here the box sits at the top of the page: on load
+     it starts open and closes; scrolling down over the first 30% of a viewport
+     opens it, scrolling back up closes it again.
      ====================================================================== */
   (function(){
     var box = $('#heroCards');
     if (!box) return;
-    var names = ['back', 'green', 'black'];
-    var cards = {}; names.forEach(function(n){ cards[n] = $('[data-card="' + n + '"]', box); });
-    var STACK = {x:0, y:0, r:-16, sx:-12, sy:0, s:.94};
-    var FAN = {
-      back:  {x:-128, y:6,   r:-30, sx:-4,  sy:-10, s:.9},
-      green: {x:-44,  y:-74, r:-14, sx:-8,  sy:-3,  s:.95},
-      black: {x:72,   y:40,  r:6,   sx:-6,  sy:-4,  s:1}
+    var START = {x:0, y:0, r:45, sx:-20, sy:0};
+    var END = {                                     // px at the reference's 660px box
+      back:  {x:-15, y:20,  r:70, sx:-5,  sy:-22},  // reference item-1 (bottom)
+      green: {x:0,   y:0,   r:67, sx:-15, sy:-3},   // reference item-2
+      black: {x:10,  y:-55, r:85, sx:-10, sy:-7}    // reference item-3 (top)
     };
-    var SPREAD = {                                   // extra travel at full scroll progress
-      back:  {x:-18, y:10,  r:-6, sx:0, sy:-4, s:0},
-      green: {x:-4,  y:-20, r:-3, sx:0, sy:-1, s:0},
-      black: {x:16,  y:16,  r:3,  sx:0, sy:-1, s:0}
-    };
-    var INTRO_MS = 1600, TAU = 0.16;                 // TAU: smoothing time constant (s) ~ scrub .5
-    var intro = MOTION ? 0 : 1, scrollCur = 0, scrollTarget = 0, k = 1, raf = 0, last = 0, introStart = 0;
-    function lerp(a, b, t){ return a + (b - a) * t; }
+    var names = Object.keys(END), cards = {};
+    names.forEach(function(n){ cards[n] = $('[data-card="' + n + '"]', box); });
+    var TAU = 0.16;                                 // smoothing time constant (s) ~ GSAP scrub .5
+    var cur = 0, target = 1, k = 1, raf = 0, last = 0, intro = MOTION ? 0 : 1, introStart = 0, INTRO_MS = 1500;
     function outCubic(t){ return 1 - Math.pow(1 - t, 3); }
+    function lerp(a, b, t){ return a + (b - a) * t; }
     function measure(){
-      k = box.offsetWidth / 600;
-      var range = Math.max(200, window.innerHeight * 0.45);
-      scrollTarget = MOTION ? clamp(window.pageYOffset / range, 0, 1) : 0;
+      k = box.offsetWidth / 660;
+      target = MOTION ? clamp(window.pageYOffset / Math.max(200, window.innerHeight * 0.3), 0, 1) : 1;   // closed at rest, opens as you scroll down
     }
     function paint(){
-      var e = outCubic(intro);
       names.forEach(function(n){
-        var f = FAN[n], sp = SPREAD[n], t = scrollCur;
-        var x = (lerp(STACK.x, f.x, e) + sp.x * t) * k, y = (lerp(STACK.y, f.y, e) + sp.y * t) * k;
-        var r = lerp(STACK.r, f.r, e) + sp.r * t, sx = lerp(STACK.sx, f.sx, e) + sp.sx * t, sy = lerp(STACK.sy, f.sy, e) + sp.sy * t;
-        var sc = lerp(STACK.s, f.s, e);
-        cards[n].style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) rotate(' + r.toFixed(3) + 'deg) skew(' + sx.toFixed(3) + 'deg,' + sy.toFixed(3) + 'deg) scale(' + sc.toFixed(4) + ')';
+        var f = END[n], t = Math.max(cur, 1 - outCubic(intro));            // 0 = stacked, 1 = fanned; the intro starts open and closes
+        cards[n].style.transform = 'translate3d(' + (lerp(START.x, f.x, t) * k).toFixed(2) + 'px,' + (lerp(START.y, f.y, t) * k).toFixed(2) + 'px,0) rotate(' +
+          lerp(START.r, f.r, t).toFixed(3) + 'deg) skew(' + lerp(START.sx, f.sx, t).toFixed(3) + 'deg,' + lerp(START.sy, f.sy, t).toFixed(3) + 'deg)';
       });
     }
     function tick(now){
       raf = 0;
       var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016; last = now;
       if (introStart && intro < 1) intro = clamp((now - introStart) / INTRO_MS, 0, 1);
-      scrollCur += (scrollTarget - scrollCur) * (1 - Math.exp(-dt / TAU));
-      if (Math.abs(scrollTarget - scrollCur) < 0.0005) scrollCur = scrollTarget;
+      cur += (target - cur) * (1 - Math.exp(-dt / TAU));
+      if (Math.abs(target - cur) < 0.0005) cur = target;
       paint();
-      if ((introStart && intro < 1) || scrollCur !== scrollTarget) raf = requestAnimationFrame(tick); else last = 0;
+      if (cur !== target || (introStart && intro < 1)) raf = requestAnimationFrame(tick); else last = 0;
     }
     function kick(){ if (!raf) raf = requestAnimationFrame(tick); }
     window.addEventListener('scroll', function(){ measure(); kick(); }, {passive:true});
     window.addEventListener('resize', function(){ measure(); paint(); });
-    measure(); scrollCur = scrollTarget; paint();
-    if (MOTION) onReady(function(){ setTimeout(function(){ introStart = performance.now(); kick(); }, 450); });
+    measure(); cur = target; paint();
+    if (MOTION) onReady(function(){ setTimeout(function(){ introStart = performance.now(); kick(); }, 450); });   // load: starts open, then closes
   })();
 
   /* ---------- floating contact button ---------- */
