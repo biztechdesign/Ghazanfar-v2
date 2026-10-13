@@ -69,8 +69,8 @@
   })();
 
   /* ======================================================================
-     HEADER — fixed dark bar; slides away when scrolling down past its own
-     height (.2s) and returns on any upward scroll (.4s), as the reference.
+     HEADER — fixed bar, transparent over the hero and frosted glass once scrolled;
+     it stays visible in both scroll directions.
      ====================================================================== */
   var header = $('#siteHeader');
   var menuLocked = false;                                           // mega/mobile menu open: keep header shown
@@ -80,10 +80,7 @@
       ticking = false;
       var y = window.scrollY, h = header.offsetHeight;
       header.classList.toggle('is-scrolled', y > 0);
-      if (!menuLocked){
-        if (y > lastY && y > h) header.classList.add('is-hidden');
-        else if (y < lastY) header.classList.remove('is-hidden');
-      }
+      header.classList.remove('is-hidden');                           // always visible while scrolling (glass bar)
       lastY = y;
     }
     window.addEventListener('scroll', function(){ if (!ticking){ ticking = true; requestAnimationFrame(update); } }, {passive:true});
