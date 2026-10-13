@@ -71,7 +71,7 @@
   /* shared reveal system (all scroll entrances rise from below) */
   --rv-dist:45px;                      /* travel distance, bottom -> top */
   --rv-ease:var(--ease-out-3);         /* power3.out, as the reference's cards */
-  --rv-stagger:.12s;                   /* gap between related items (read by main.js) */
+  --rv-stagger:.2s;                    /* gap between related items (read by main.js) */
 }
 @media (min-width:640px){ :root{--gutter:24px;--fs-lead:18px;--fs-h1:48px;} }
 @media (min-width:769px){ :root{--gutter:32px;--section-y:80px;--head-gap:56px;--fs-h2:36px;--fs-h3:24px;} }

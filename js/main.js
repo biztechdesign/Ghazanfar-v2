@@ -323,7 +323,7 @@
     var items = $$('[data-rise]');
     if (!MOTION){ return; }
     $$('[data-stagger]').forEach(function(group){
-      $$('[data-rise]', group).forEach(function(el, i){ el.style.setProperty('--delay', (i * 0.12) + 's'); });
+      $$('[data-rise]', group).forEach(function(el, i){ el.style.setProperty('--delay', (i * 0.2) + 's'); });
     });
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
