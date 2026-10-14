@@ -700,13 +700,13 @@
     };
     var names = Object.keys(END), cards = {};
     names.forEach(function(n){ cards[n] = $('[data-card="' + n + '"]', box); });
-    var TAU = 0.16;                                 // smoothing time constant (s) ~ GSAP scrub .5
-    var cur = 0, target = 1, k = 1, raf = 0, last = 0, intro = MOTION ? 0 : 1, introStart = 0, INTRO_MS = 1500;
-    function outCubic(t){ return 1 - Math.pow(1 - t, 3); }
+    var TAU = 0.34;                                 // smoothing time constant (s) ~ GSAP scrub .5
+    var cur = 0, target = 1, k = 1, raf = 0, last = 0, intro = MOTION ? 0 : 1, introStart = 0, INTRO_MS = 2600;
+    function outCubic(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }   // in-out cubic: gentle start and finish
     function lerp(a, b, t){ return a + (b - a) * t; }
     function measure(){
       k = box.offsetWidth / 660;
-      target = MOTION ? clamp(window.pageYOffset / Math.max(200, window.innerHeight * 0.3), 0, 1) : 1;   // closed at rest, opens as you scroll down
+      target = MOTION ? clamp(window.pageYOffset / Math.max(200, window.innerHeight * 0.5), 0, 1) : 1;   // closed at rest, opens as you scroll down
     }
     function paint(){
       names.forEach(function(n){
@@ -728,7 +728,7 @@
     window.addEventListener('scroll', function(){ measure(); kick(); }, {passive:true});
     window.addEventListener('resize', function(){ measure(); paint(); });
     measure(); cur = target; paint();
-    if (MOTION) onReady(function(){ setTimeout(function(){ introStart = performance.now(); kick(); }, 450); });   // load: starts open, then closes
+    if (MOTION) onReady(function(){ setTimeout(function(){ introStart = performance.now(); kick(); }, 700); });   // load: starts open, then closes
   })();
 
   /* ---------- floating contact button ---------- */
