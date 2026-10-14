@@ -474,7 +474,7 @@ html.is-loading{overflow:hidden;}
    radius straightens (reference: start top 65%, +=120%, power2.inOut) */
 .expand-media{position:relative;margin:var(--head-gap) auto 0;width:calc(100% - 2 * var(--gutter));max-width:calc(var(--container) - 2 * var(--gutter));
   border-radius:var(--r-xl);overflow:hidden;aspect-ratio:16/7.2;}
-.expand-media img{width:100%;height:100%;object-fit:cover;}
+.expand-media img{width:100%;height:100%;object-fit:cover;object-position:50% 22%;}  /* keep the minaret tops in the wide crop */
 @media (max-width:1023px){ .expand-media{aspect-ratio:4/3;border-radius:var(--r-lg);} }
 
 /* ---------- 11. FEATURE CAROUSEL ---------- */
